@@ -12,10 +12,12 @@ fun Route.userRouting() {
         listAllUsers()
         getUserById()
         addUser()
+        getUserByEmail()
         deleteUserById()
     }
 }
 
+// Devolve todos os usuarios salvos
 fun Route.listAllUsers() {
     get {
         if (userStorage.isNotEmpty()) {
@@ -26,8 +28,9 @@ fun Route.listAllUsers() {
     }
 }
 
+// Devolve o usuario com o id especificado
 fun Route.getUserById() {
-    get("{id?}") {
+    get("id={id?}") {
         val id = call.parameters["id"] ?: return@get call.respondText(
             "ID faltando\n",
             status = HttpStatusCode.BadRequest
@@ -40,18 +43,41 @@ fun Route.getUserById() {
     }
 }
 
+// Devolve o usuario com o email especificado
+fun Route.getUserByEmail() {
+    get("email={email?}") {
+        val email = call.parameters["email"] ?: return@get call.respondText(
+            "E-mail faltando\n",
+            status = HttpStatusCode.BadRequest
+        )
+        val user = userStorage.find { it.email == email } ?: return@get call.respondText(
+            "Sem usuario com o e-mail $email\n",
+            status = HttpStatusCode.NotFound
+        )
+        call.respond(user)
+    }
+}
+
+// Adiciona o usuario
 fun Route.addUser() {
     post {
         val user = call.receive<User>()
-        if (user in userStorage) return@post call.respondText(
-            "Usuario ja existe\n",
+        var maxId = -1
+        userStorage.forEach {
+            maxId = if (it.id > maxId) it.id else maxId
+        }
+        user.id = if (userStorage.isEmpty()) 0 else maxId + 1
+        if (userStorage.find { it.email == user.email } != null) return@post call.respondText(
+            "Email ja utilizado\n",
             status = HttpStatusCode.Conflict
         )
         userStorage.add(user)
+        call.respond(user)
         call.respondText("Usuario adicionado com sucesso!\n", status = HttpStatusCode.Created)
     }
 }
 
+// Deleta o usuario com o id especificado
 fun Route.deleteUserById() {
     delete("{id?}") {
         val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest)

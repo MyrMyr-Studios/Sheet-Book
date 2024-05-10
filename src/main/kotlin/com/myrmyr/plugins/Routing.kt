@@ -1,5 +1,6 @@
 package com.myrmyr.plugins
 
+import com.myrmyr.routes.campaignRouting
 import com.myrmyr.routes.sheetRouting
 import com.myrmyr.routes.userRouting
 import io.ktor.server.application.*
@@ -15,5 +16,6 @@ fun Application.configureRouting() {
         }
         userRouting()
         sheetRouting()
+        campaignRouting()
     }
 }

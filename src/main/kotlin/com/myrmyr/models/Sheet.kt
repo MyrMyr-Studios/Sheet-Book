@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Sheet (
     val ownerId: Int,
-    val sheetId: Int,
+    var sheetId: Int = -1,
     val name: String,
     val level: Int,
     val class_t: String,

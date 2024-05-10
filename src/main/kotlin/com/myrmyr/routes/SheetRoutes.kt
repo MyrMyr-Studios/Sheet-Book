@@ -64,7 +64,7 @@ fun Route.getSheetByUserId() {
 
 // Devolve todas as fichas com o nome especificdo do usuario especificado
 fun Route.getSheetByUserIdAndName() {
-    get("uzerSheets/{userId?}/{sheetName?}") {
+    get("userSheets/{userId?}/{sheetName?}") {
         val userId = call.parameters["userId"] ?: return@get call.respondText(
             "ID do usuario faltando\n",
             status = HttpStatusCode.BadRequest
@@ -94,10 +94,11 @@ fun Route.addSheet() {
             "Usuario ${sheet.ownerId} nao existe\n",
             status = HttpStatusCode.NotFound
         )
-        if (sheet in sheetStorage) return@post call.respondText(
-            "Ficha ja existe\n",
-            status = HttpStatusCode.Conflict
-        )
+        var maxId = -1
+        sheetStorage.forEach {
+            maxId = if (it.sheetId > maxId) it.sheetId else maxId
+        }
+        sheet.sheetId = if (sheetStorage.isEmpty()) 0 else maxId + 1
         sheetStorage.add(sheet)
         call.respondText("Ficha adicionada com sucesso!\n", status = HttpStatusCode.Created)
     }
