@@ -108,10 +108,16 @@ fun Route.addSheet() {
 fun Route.deleteSheetById() {
     delete("{id?}") {
         val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
-        if (sheetStorage.removeIf { it.sheetId == id.toInt() }) {
+        if (sheetStorage.find { it.sheetId == id.toInt() } == null) return@delete call.respondText(
+            "Ficha $id nao existe\n",
+            status = HttpStatusCode.NotFound
+        )
+        campaignStorage.forEach { (_, _, _, sheetList): Campaign -> sheetList.removeIf { it == id.toInt() } }
+        sheetStorage.removeIf { it.sheetId == id.toInt() }
+        /*if (sheetStorage.removeIf { it.sheetId == id.toInt() }) {
             call.respondText("Ficha removida corretamente\n", status = HttpStatusCode.Accepted)
         } else {
             call.respondText("Ficha $id nao foi encontrada\n", status = HttpStatusCode.NotFound)
-        }
+        }*/
     }
 }

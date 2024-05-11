@@ -16,8 +16,11 @@ fun Route.campaignRouting() {
         getCampaignsByName()
         getUserCampaigns()
         addCampaign()
+        deleteCampaign()
         addUserIdToCampaign()
+        deleteUserIdFromCampaign()
         addSheetIdToCampaign()
+        deleteSheetIdFromCampaign()
     }
 }
 
@@ -77,7 +80,7 @@ fun Route.getUserCampaigns() {
             "Usuario $userId nao existe\n",
             status = HttpStatusCode.NotFound
         )
-        val campaigns = campaignStorage.filter { campaign -> campaign.userList.find { it.id == userId.toInt() } != null }
+        val campaigns = campaignStorage.filter { userId.toInt() in it.userList }//val campaigns = campaignStorage.filter { campaign -> campaign.userList.find { it.id == userId.toInt() } != null }
         if (campaigns.isEmpty()) return@get call.respondText(
             "Usuario $userId nao esta em nenhuma campanha\n",
             status = HttpStatusCode.NotFound
@@ -102,13 +105,21 @@ fun Route.addCampaign() {
 }
 
 // Deleta campanha especificada
-//fun Route.deleteCampaign
+fun Route.deleteCampaign() {
+    delete("{id?}") {
+        val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
+        if (campaignStorage.removeIf { it.campaignId == id.toInt() }) {
+            call.respondText("Campanha removida corretamente\n", status = HttpStatusCode.Accepted)
+        } else {
+            call.respondText("Campanha $id nao foi encontrada\n", status = HttpStatusCode.NotFound)
+        }
+    }
+}
 
-// Adiciona o usuario especificado a campanha
+// Adiciona o usuario especificado a campanha especificada
 fun Route.addUserIdToCampaign() {
     post("addUser/{campaignId?}") {
         val campaignId = call.parameters["campaignId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
-        println(campaignId)
         if (campaignStorage.find { it.campaignId == campaignId.toInt() } == null) return@post call.respondText(
             "Campanha com id $campaignId nao existe\n",
             status = HttpStatusCode.NotFound
@@ -124,19 +135,51 @@ fun Route.addUserIdToCampaign() {
             "Usuario $userId nao existe\n",
             status = HttpStatusCode.NotFound
         )
-        if (campaign!!.userList.find { it.id == userId } != null) return@post call.respondText(
+        if (userId in campaign!!.userList) return@post call.respondText(//if (campaign!!.userList.find { it.id == userId } != null) return@post call.respondText(
             "Usuario $userId ja esta na campanha $campaignId\n",
             status = HttpStatusCode.Conflict
         )
-        userStorage.find { it.id == userId }?.let { it1 -> campaign.userList.add(it1) }
-        call.respondText("Usuario $userId adicionado a campanha $campaignId com sucesso!")
+        campaign.userList.add(userId)//userStorage.find { it.id == userId }?.let { it1 -> campaign.userList.add(it1) }
+        call.respondText(
+            "Usuario $userId adicionado a campanha $campaignId com sucesso!",
+            status = HttpStatusCode.OK
+        )
     }
 }
 
+// Deleta o usuario especificado da campanha especificada
+fun Route.deleteUserIdFromCampaign() {
+    delete("{campaignId?}/userId={userId?}") {
+        val campaignId = call.parameters["campaignId"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
+        if (campaignStorage.find { it.campaignId == campaignId.toInt() } == null) return@delete call.respondText(
+            "Campanha com id $campaignId nao existe\n",
+            status = HttpStatusCode.NotFound
+        )
+        val campaign = campaignStorage.find { it.campaignId == campaignId.toInt() }
+        val userId = call.parameters["userId"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
+        //println(userId)
+        if (userStorage.find { it.id == userId.toInt() } == null) return@delete call.respondText(
+            "Usuario $userId nao existe\n",
+            status = HttpStatusCode.NotFound
+        )
+        if (campaign!!.userList.removeIf { it == userId.toInt() }) {
+            call.respondText(
+                "Usuario $userId removido corretamente da campanha $campaignId\n",
+                status = HttpStatusCode.Accepted
+            )
+        } else {
+            call.respondText(
+                "Usuario $userId nao esta na campanha $campaignId\n",
+                status = HttpStatusCode.NotFound
+            )
+        }
+    }
+}
+
+// Adiciona a ficha especificada a campanha especificada
 fun Route.addSheetIdToCampaign() {
     post("addSheet/{campaignId?}") {
         val campaignId = call.parameters["campaignId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
-        println(campaignId)
         if (campaignStorage.find { it.campaignId == campaignId.toInt() } == null) return@post call.respondText(
             "Campanha com id $campaignId nao existe\n",
             status = HttpStatusCode.NotFound
@@ -152,11 +195,49 @@ fun Route.addSheetIdToCampaign() {
             "Ficha $sheetId nao existe\n",
             status = HttpStatusCode.NotFound
         )
-        if (campaign!!.sheetList.find { it.sheetId == sheetId } != null) return@post call.respondText(
+        /*if (campaign!!.sheetList.find { it.sheetId == sheetId } != null) return@post call.respondText(
             "Ficha $sheetId ja esta na campanha $campaignId\n",
             status = HttpStatusCode.Conflict
         )
         sheetStorage.find { it.sheetId == sheetId }?.let { it1 -> campaign.sheetList.add(it1) }
-        call.respondText("Ficha $sheetId adicionada a campanha $campaignId com sucesso!")
+        call.respondText("Ficha $sheetId adicionada a campanha $campaignId com sucesso!")*/
+        if (sheetId in campaign!!.sheetList) return@post call.respondText(
+            "Ficha $sheetId ja esta na campanha $campaignId\n",
+            status = HttpStatusCode.Conflict
+        )
+        campaign.sheetList.add(sheetId)
+        call.respondText(
+            "Ficha $sheetId adicionada a campanha $campaignId com sucesso!\n",
+            status = HttpStatusCode.OK
+        )
+    }
+}
+
+// Deleta a ficha especificada da campanha especificada
+fun Route.deleteSheetIdFromCampaign() {
+    delete("{campaignId?}/sheetId={sheetId?}") {
+        val campaignId = call.parameters["campaignId"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
+        if (campaignStorage.find { it.campaignId == campaignId.toInt() } == null) return@delete call.respondText(
+            "Campanha com id $campaignId nao existe\n",
+            status = HttpStatusCode.NotFound
+        )
+        val campaign = campaignStorage.find { it.campaignId == campaignId.toInt() }
+        val sheetId = call.parameters["sheetId"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
+        println(sheetId)
+        if (sheetStorage.find { it.sheetId == sheetId.toInt() } == null) return@delete call.respondText(
+            "Ficha $sheetId nao existe\n",
+            status = HttpStatusCode.NotFound
+        )
+        if (campaign!!.sheetList.removeIf { it == sheetId.toInt() }) {
+            call.respondText(
+                "Ficha $sheetId removida corretamente da campanha $campaignId\n",
+                status = HttpStatusCode.Accepted
+            )
+        } else {
+            call.respondText(
+                "Ficha $sheetId nao esta na campanha $campaignId\n",
+                status = HttpStatusCode.NotFound
+            )
+        }
     }
 }

@@ -81,11 +81,22 @@ fun Route.addUser() {
 fun Route.deleteUserById() {
     delete("{id?}") {
         val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
+        if (userStorage.find { it.id == id.toInt() } == null) return@delete call.respondText(
+            "Usuario $id nao existe\n",
+            status = HttpStatusCode.NotFound
+        )
+        campaignStorage.forEach { (_, _, userList): Campaign -> userList.removeIf { it == id.toInt() } }
+        sheetStorage.forEach { (ownerId, targetId): Sheet ->
+            if (ownerId == id.toInt()) {
+                campaignStorage.forEach { it: Campaign -> it.sheetList.removeIf { it == targetId } }
+            }
+        }
         sheetStorage.removeIf { it.ownerId == id.toInt() }
-        if (userStorage.removeIf { it.id == id.toInt() }) {
+        userStorage.removeIf { it.id == id.toInt() }
+        /*if (userStorage.removeIf { it.id == id.toInt() }) {
             call.respondText("Usuario removido corretamente\n", status = HttpStatusCode.Accepted)
         } else {
             call.respondText("Nao achado\n", status = HttpStatusCode.NotFound)
-        }
+        }*/
     }
 }
