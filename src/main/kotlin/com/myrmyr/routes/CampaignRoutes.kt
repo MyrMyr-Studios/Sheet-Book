@@ -6,6 +6,8 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
 fun Route.campaignRouting() {
     route("/campaigns") {
@@ -86,8 +88,9 @@ fun Route.getUserCampaigns() {
 
 // Cria uma campanha vazia
 fun Route.addCampaign() {
-    post {
-        val campaign = call.receive<Campaign>()
+    post("{name?}") {
+        val campaignName = call.parameters["name"]?: return@post call.respond(HttpStatusCode.BadRequest)
+        val campaign = Campaign(name=campaignName)
         var maxId = -1
         campaignStorage.forEach {
             maxId = if (it.campaignId > maxId) it.campaignId else maxId
@@ -103,52 +106,57 @@ fun Route.addCampaign() {
 
 // Adiciona o usuario especificado a campanha
 fun Route.addUserIdToCampaign() {
-    post("campaignId={campaignId?}&userId={userId?}") {
+    post("addUser/{campaignId?}") {
         val campaignId = call.parameters["campaignId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
+        println(campaignId)
         if (campaignStorage.find { it.campaignId == campaignId.toInt() } == null) return@post call.respondText(
             "Campanha com id $campaignId nao existe\n",
             status = HttpStatusCode.NotFound
         )
         val campaign = campaignStorage.find { it.campaignId == campaignId.toInt() }
-        val userId = call.parameters["userId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
-        if (userStorage.find { it.id == userId.toInt() } == null) return@post call.respondText(
+
+        // Nao nai ter jeito, vai ter que ter mais gambiarra
+        @Serializable
+        data class Gambiarra(val userId: Int)
+        val userId = call.receive<Gambiarra>().userId
+
+        if (userStorage.find { it.id == userId } == null) return@post call.respondText(
             "Usuario $userId nao existe\n",
             status = HttpStatusCode.NotFound
         )
-        if (campaign!!.userList.find { it.id == userId.toInt() } == null) return@post call.respondText(
+        if (campaign!!.userList.find { it.id == userId } != null) return@post call.respondText(
             "Usuario $userId ja esta na campanha $campaignId\n",
             status = HttpStatusCode.Conflict
         )
-        userStorage.find { it.id == userId.toInt() }?.let { it1 -> campaign.userList.add(it1) }
+        userStorage.find { it.id == userId }?.let { it1 -> campaign.userList.add(it1) }
         call.respondText("Usuario $userId adicionado a campanha $campaignId com sucesso!")
     }
 }
 
 fun Route.addSheetIdToCampaign() {
-    post("campaignId={campaignId?}&sheetId={sheetId?}") {
+    post("addSheet/{campaignId?}") {
         val campaignId = call.parameters["campaignId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
+        println(campaignId)
         if (campaignStorage.find { it.campaignId == campaignId.toInt() } == null) return@post call.respondText(
             "Campanha com id $campaignId nao existe\n",
             status = HttpStatusCode.NotFound
         )
         val campaign = campaignStorage.find { it.campaignId == campaignId.toInt() }
-        /*val sheetId = call.parameters["sheetId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
-        if (sheetId.toInt() in campaign!!.sheetList) return@post call.respondText(
-            "Ficha $sheetId ja esta na campanha $campaignId\n",
-            status = HttpStatusCode.Conflict
-        )
-        campaign.sheetList.add(sheetId.toInt())
-        call.respondText("Ficha $sheetId adicionada a campanha $campaignId com sucesso!")*/
-        val sheetId = call.parameters["sheetId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
-        if (sheetStorage.find { it.sheetId == sheetId.toInt() } == null) return@post call.respondText(
+
+        // Nao nai ter jeito, vai ter que ter mais gambiarra
+        @Serializable
+        data class Gambiarra(val sheetId: Int) {}
+        val sheetId = call.receive<Gambiarra>().sheetId
+
+        if (sheetStorage.find { it.sheetId == sheetId } == null) return@post call.respondText(
             "Ficha $sheetId nao existe\n",
             status = HttpStatusCode.NotFound
         )
-        if (campaign!!.sheetList.find { it.sheetId == sheetId.toInt() } == null) return@post call.respondText(
+        if (campaign!!.sheetList.find { it.sheetId == sheetId } != null) return@post call.respondText(
             "Ficha $sheetId ja esta na campanha $campaignId\n",
             status = HttpStatusCode.Conflict
         )
-        sheetStorage.find { it.sheetId == sheetId.toInt() }?.let { it1 -> campaign.sheetList.add(it1) }
-        call.respondText("Ficha $sheetId adicionado a campanha $campaignId com sucesso!")
+        sheetStorage.find { it.sheetId == sheetId }?.let { it1 -> campaign.sheetList.add(it1) }
+        call.respondText("Ficha $sheetId adicionada a campanha $campaignId com sucesso!")
     }
 }
