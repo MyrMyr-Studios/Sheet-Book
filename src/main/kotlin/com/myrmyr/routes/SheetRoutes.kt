@@ -17,6 +17,7 @@ fun Route.sheetRouting() {
         getSheetByUserIdAndName()
         addSheet()
         deleteSheetById()
+        updateSheetById()
     }
 }
 
@@ -119,5 +120,32 @@ fun Route.deleteSheetById() {
         } else {
             call.respondText("Ficha $id nao foi encontrada\n", status = HttpStatusCode.NotFound)
         }*/
+    }
+}
+
+// Atualiza a ficha especificada com as informaçoes mandadas
+fun Route.updateSheetById() {
+    post("{sheetId?}") {
+        val sheetId = call.parameters["sheetId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
+        val originalSheet = sheetStorage.find { it.sheetId == sheetId.toInt() }
+        if (originalSheet == null) return@post call.respondText(
+            "Ficha $sheetId nao existe\n",
+            status = HttpStatusCode.NotFound
+        )
+        val updatedSheet = call.receive<Sheet>()
+        if (updatedSheet.sheetId != originalSheet.sheetId) return@post call.respondText(
+            "sheetId's sao diferentes\n",
+            status = HttpStatusCode.Conflict
+        )
+        if (updatedSheet.ownerId != originalSheet.ownerId) return@post call.respondText(
+            "ownerId's sao diiferentes\n",
+            status = HttpStatusCode.Conflict
+        )
+        sheetStorage.forEachIndexed { index, sheet ->
+            sheet.takeIf { it.sheetId == sheetId.toInt() }.let {
+                sheetStorage[index] = updatedSheet
+            }
+        }
+        call.respondText("Ficha $sheetId atualizada com sucesso!\n", status = HttpStatusCode.OK)
     }
 }
