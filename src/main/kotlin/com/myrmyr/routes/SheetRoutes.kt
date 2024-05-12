@@ -7,6 +7,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import java.net.URLDecoder
 
 
 fun Route.sheetRouting() {
@@ -70,7 +71,7 @@ fun Route.getSheetByUserIdAndName() {
             "ID do usuario faltando\n",
             status = HttpStatusCode.BadRequest
         )
-        val sheetName = call.parameters["sheetName"] ?: return@get call.respondText(
+        val sheetName = URLDecoder.decode(call.parameters["sheetName"], "UTF-8") ?: return@get call.respondText(
             "Nome do personagem faltando\n",
             status = HttpStatusCode.BadRequest
         )

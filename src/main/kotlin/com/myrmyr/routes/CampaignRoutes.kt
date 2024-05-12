@@ -7,7 +7,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
+import java.net.URLDecoder
 
 fun Route.campaignRouting() {
     route("/campaigns") {
@@ -56,7 +56,7 @@ fun Route.getCampaignById() {
 // Devolve todas as campanhas com o nome especificado
 fun Route.getCampaignsByName() {
     get("name={name?}") {
-        val name = call.parameters["name"] ?: return@get call.respondText(
+        val name = URLDecoder.decode(call.parameters["name"], "UTF-8") ?: return@get call.respondText(
             "Nome faltando\n",
             status = HttpStatusCode.BadRequest
         )
@@ -194,12 +194,6 @@ fun Route.addSheetIdToCampaign() {
             "Ficha $sheetId nao existe\n",
             status = HttpStatusCode.NotFound
         )
-        /*if (campaign!!.sheetList.find { it.sheetId == sheetId } != null) return@post call.respondText(
-            "Ficha $sheetId ja esta na campanha $campaignId\n",
-            status = HttpStatusCode.Conflict
-        )
-        sheetStorage.find { it.sheetId == sheetId }?.let { it1 -> campaign.sheetList.add(it1) }
-        call.respondText("Ficha $sheetId adicionada a campanha $campaignId com sucesso!")*/
         if (sheetId in campaign!!.sheetList) return@post call.respondText(
             "Ficha $sheetId ja esta na campanha $campaignId\n",
             status = HttpStatusCode.Conflict

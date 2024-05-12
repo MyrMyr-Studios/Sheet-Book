@@ -7,6 +7,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
+import java.net.URLDecoder
 
 fun Route.userRouting() {
     route("/users") {
@@ -57,7 +58,7 @@ fun Route.getUserById() {
 // Devolve o usuario com o email especificado
 fun Route.getUserByEmail() {
     get("email={email?}") {
-        val email = call.parameters["email"] ?: return@get call.respondText(
+        val email = URLDecoder.decode(call.parameters["email"], "UTF-8") ?: return@get call.respondText(
             "E-mail faltando\n",
             status = HttpStatusCode.BadRequest
         )
@@ -117,7 +118,7 @@ fun Route.checkPassword() {
             status = HttpStatusCode.NotFound
         )
         val user = userStorage.find { it.id == id.toInt() }
-        val password = call.parameters["password"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+        val password = URLDecoder.decode(call.parameters["password"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
         if (password == user?.password) {
             call.respond(true)
         } else call.respond(false)
