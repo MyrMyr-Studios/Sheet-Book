@@ -6,6 +6,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
 
 fun Route.userRouting() {
     route("/users") {
@@ -14,6 +15,7 @@ fun Route.userRouting() {
         addUser()
         getUserByEmail()
         deleteUserById()
+        checkPassword()
     }
 }
 
@@ -39,7 +41,17 @@ fun Route.getUserById() {
             "Sem usuario com o ID $id\n",
             status = HttpStatusCode.NotFound
         )
-        call.respond(user)
+
+        // Gambiarrada pra nao mandar a senha junto
+        @Serializable
+        data class UserWithoutPassword(
+            val id: Int = user.id,
+            val name: String = user.name,
+            val email: String = user.email
+        )
+        val uwp = UserWithoutPassword()
+
+        call.respond(uwp)
     }
 }
 
@@ -54,7 +66,17 @@ fun Route.getUserByEmail() {
             "Sem usuario com o e-mail $email\n",
             status = HttpStatusCode.NotFound
         )
-        call.respond(user)
+
+        // Gambiarrada pra nao mandar a senha junto
+        @Serializable
+        data class UserWithoutPassword(
+            val id: Int = user.id,
+            val name: String = user.name,
+            val email: String = user.email
+        )
+        val uwp = UserWithoutPassword()
+
+        call.respond(uwp)
     }
 }
 
@@ -72,7 +94,6 @@ fun Route.addUser() {
             status = HttpStatusCode.Conflict
         )
         userStorage.add(user)
-        call.respond(user)
         call.respondText("Usuario adicionado com sucesso!\n", status = HttpStatusCode.Created)
     }
 }
@@ -93,10 +114,21 @@ fun Route.deleteUserById() {
         }
         sheetStorage.removeIf { it.ownerId == id.toInt() }
         userStorage.removeIf { it.id == id.toInt() }
-        /*if (userStorage.removeIf { it.id == id.toInt() }) {
-            call.respondText("Usuario removido corretamente\n", status = HttpStatusCode.Accepted)
-        } else {
-            call.respondText("Nao achado\n", status = HttpStatusCode.NotFound)
-        }*/
+    }
+}
+
+// Devolve True se a tentativa de senha corresponde a senha do usuario, falso c.c.
+fun Route.checkPassword() {
+    get("id={id?}/password={password?}") {
+        val id = call.parameters["id"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+        if (userStorage.find { it.id == id.toInt() } == null) return@get call.respondText(
+            "Usuario $id nao existe\n",
+            status = HttpStatusCode.NotFound
+        )
+        val user = userStorage.find { it.id == id.toInt() }
+        val password = call.parameters["password"] ?: return@get call.respond(HttpStatusCode.BadRequest)
+        if (password == user?.password) {
+            call.respond(true)
+        } else call.respond(false)
     }
 }

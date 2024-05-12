@@ -80,7 +80,7 @@ fun Route.getUserCampaigns() {
             "Usuario $userId nao existe\n",
             status = HttpStatusCode.NotFound
         )
-        val campaigns = campaignStorage.filter { userId.toInt() in it.userList }//val campaigns = campaignStorage.filter { campaign -> campaign.userList.find { it.id == userId.toInt() } != null }
+        val campaigns = campaignStorage.filter { userId.toInt() in it.userList }
         if (campaigns.isEmpty()) return@get call.respondText(
             "Usuario $userId nao esta em nenhuma campanha\n",
             status = HttpStatusCode.NotFound
@@ -91,7 +91,7 @@ fun Route.getUserCampaigns() {
 
 // Cria uma campanha vazia
 fun Route.addCampaign() {
-    post("{name?}") {
+    post("{name?}") { // Mudar pra aceitar do body do post
         val campaignName = call.parameters["name"]?: return@post call.respond(HttpStatusCode.BadRequest)
         val campaign = Campaign(name=campaignName)
         var maxId = -1
@@ -135,11 +135,11 @@ fun Route.addUserIdToCampaign() {
             "Usuario $userId nao existe\n",
             status = HttpStatusCode.NotFound
         )
-        if (userId in campaign!!.userList) return@post call.respondText(//if (campaign!!.userList.find { it.id == userId } != null) return@post call.respondText(
+        if (userId in campaign!!.userList) return@post call.respondText(
             "Usuario $userId ja esta na campanha $campaignId\n",
             status = HttpStatusCode.Conflict
         )
-        campaign.userList.add(userId)//userStorage.find { it.id == userId }?.let { it1 -> campaign.userList.add(it1) }
+        campaign.userList.add(userId)
         call.respondText(
             "Usuario $userId adicionado a campanha $campaignId com sucesso!",
             status = HttpStatusCode.OK
@@ -186,7 +186,7 @@ fun Route.addSheetIdToCampaign() {
         )
         val campaign = campaignStorage.find { it.campaignId == campaignId.toInt() }
 
-        // Nao nai ter jeito, vai ter que ter mais gambiarra
+        // Nao vai ter jeito, vai ter que ter mais gambiarra
         @Serializable
         data class Gambiarra(val sheetId: Int) {}
         val sheetId = call.receive<Gambiarra>().sheetId
@@ -195,12 +195,7 @@ fun Route.addSheetIdToCampaign() {
             "Ficha $sheetId nao existe\n",
             status = HttpStatusCode.NotFound
         )
-        /*if (campaign!!.sheetList.find { it.sheetId == sheetId } != null) return@post call.respondText(
-            "Ficha $sheetId ja esta na campanha $campaignId\n",
-            status = HttpStatusCode.Conflict
-        )
-        sheetStorage.find { it.sheetId == sheetId }?.let { it1 -> campaign.sheetList.add(it1) }
-        call.respondText("Ficha $sheetId adicionada a campanha $campaignId com sucesso!")*/
+
         if (sheetId in campaign!!.sheetList) return@post call.respondText(
             "Ficha $sheetId ja esta na campanha $campaignId\n",
             status = HttpStatusCode.Conflict
