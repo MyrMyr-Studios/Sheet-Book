@@ -19,6 +19,14 @@ fun Route.userRouting() {
     }
 }
 
+// Gambiarrada pra nao mandar a senha junto
+@Serializable
+data class UserWithoutPassword(
+    val id: Int,
+    val name: String,
+    val email: String
+)
+
 // Devolve todos os usuarios salvos
 fun Route.listAllUsers() {
     get {
@@ -41,16 +49,7 @@ fun Route.getUserById() {
             "Sem usuario com o ID $id\n",
             status = HttpStatusCode.NotFound
         )
-
-        // Gambiarrada pra nao mandar a senha junto
-        @Serializable
-        data class UserWithoutPassword(
-            val id: Int = user.id,
-            val name: String = user.name,
-            val email: String = user.email
-        )
-        val uwp = UserWithoutPassword()
-
+        val uwp = UserWithoutPassword(user.id, user.name, user.email)
         call.respond(uwp)
     }
 }
@@ -66,16 +65,7 @@ fun Route.getUserByEmail() {
             "Sem usuario com o e-mail $email\n",
             status = HttpStatusCode.NotFound
         )
-
-        // Gambiarrada pra nao mandar a senha junto
-        @Serializable
-        data class UserWithoutPassword(
-            val id: Int = user.id,
-            val name: String = user.name,
-            val email: String = user.email
-        )
-        val uwp = UserWithoutPassword()
-
+        val uwp = UserWithoutPassword(user.id, user.name, user.email)
         call.respond(uwp)
     }
 }
@@ -94,6 +84,7 @@ fun Route.addUser() {
             status = HttpStatusCode.Conflict
         )
         userStorage.add(user)
+        call.respond(user)
         call.respondText("Usuario adicionado com sucesso!\n", status = HttpStatusCode.Created)
     }
 }

@@ -91,8 +91,8 @@ fun Route.getUserCampaigns() {
 
 // Cria uma campanha vazia
 fun Route.addCampaign() {
-    post("{name?}") { // Mudar pra aceitar do body do post
-        val campaignName = call.parameters["name"]?: return@post call.respond(HttpStatusCode.BadRequest)
+    post {
+        val campaignName = call.receive<String>()
         val campaign = Campaign(name=campaignName)
         var maxId = -1
         campaignStorage.forEach {
@@ -157,7 +157,6 @@ fun Route.deleteUserIdFromCampaign() {
         )
         val campaign = campaignStorage.find { it.campaignId == campaignId.toInt() }
         val userId = call.parameters["userId"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
-        //println(userId)
         if (userStorage.find { it.id == userId.toInt() } == null) return@delete call.respondText(
             "Usuario $userId nao existe\n",
             status = HttpStatusCode.NotFound
@@ -186,7 +185,7 @@ fun Route.addSheetIdToCampaign() {
         )
         val campaign = campaignStorage.find { it.campaignId == campaignId.toInt() }
 
-        // Nao vai ter jeito, vai ter que ter mais gambiarra
+        // Nao nai ter jeito, vai ter que ter mais gambiarra
         @Serializable
         data class Gambiarra(val sheetId: Int) {}
         val sheetId = call.receive<Gambiarra>().sheetId
@@ -195,7 +194,12 @@ fun Route.addSheetIdToCampaign() {
             "Ficha $sheetId nao existe\n",
             status = HttpStatusCode.NotFound
         )
-
+        /*if (campaign!!.sheetList.find { it.sheetId == sheetId } != null) return@post call.respondText(
+            "Ficha $sheetId ja esta na campanha $campaignId\n",
+            status = HttpStatusCode.Conflict
+        )
+        sheetStorage.find { it.sheetId == sheetId }?.let { it1 -> campaign.sheetList.add(it1) }
+        call.respondText("Ficha $sheetId adicionada a campanha $campaignId com sucesso!")*/
         if (sheetId in campaign!!.sheetList) return@post call.respondText(
             "Ficha $sheetId ja esta na campanha $campaignId\n",
             status = HttpStatusCode.Conflict
