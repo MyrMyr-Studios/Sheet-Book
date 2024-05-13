@@ -10,6 +10,7 @@ import kotlinx.serialization.Serializable
 import java.net.URLDecoder
 import io.ktor.server.sessions.*
 import com.myrmyr.UserSession
+import com.myrmyr.dao.*
 
 fun Route.userRouting() {
     route("/users") {
@@ -25,8 +26,9 @@ fun Route.userRouting() {
 // Devolve todos os usuarios salvos
 fun Route.listAllUsers() {
     get {
-        if (userStorage.isNotEmpty()) {
-            call.respond(userStorage)
+        val userList = dao.allUsers()
+        if (userList.isEmpty()) {
+            call.respond(userList)
         } else {
             call.respondText("Sem usuarios\n", status = HttpStatusCode.OK)
         }
@@ -37,30 +39,26 @@ fun Route.login() {
     get {
         val email = URLDecoder.decode(call.parameters["email"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
         val password = URLDecoder.decode(call.parameters["password"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
-        userStorage.find { it.email == email }?.let {
-            if (it.password == password) {
-                call.sessions.set(UserSession(id = it.userId))
-                call.respondText("Login efetuado com sucesso\n", status = HttpStatusCode.OK)
-            } else call.respondText("Senha incorreta\n", status = HttpStatusCode.Unauthorized)
-        } ?: call.respondText("Usuario nao encontrado\n", status = HttpStatusCode.NotFound)
+        val user = dao.findUserByEmail(email)
+        if (user == null) call.respondText("Usuario nao encontrado\n", status = HttpStatusCode.NotFound)
+        if (user!!.password == password) {
+            call.sessions.set(UserSession(id = user.userId))
+            call.respondText("Login efetuado com sucesso\n", status = HttpStatusCode.OK)
+        } else call.respondText("Senha incorreta\n", status = HttpStatusCode.Unauthorized)
     }
 }
 
 fun Route.signUp() {
     post {
         val user = call.receive<User>()
-        var maxId = -1
-        userStorage.forEach {
-            maxId = if (it.userId > maxId) it.userId else maxId
-        }
-        user.userId = if (userStorage.isEmpty()) 0 else maxId + 1
-        if (userStorage.find { it.email == user.email } != null) return@post call.respondText(
+        if (dao.findUserByEmail(user.email) != null) return@post call.respondText(
             "Email ja utilizado\n",
             status = HttpStatusCode.Conflict
         )
-        userStorage.add(user)
-        call.sessions.set(UserSession(id = user.userId))
-        call.respondText("Usuario adicionado com sucesso!\n", status = HttpStatusCode.Created)
+        if (dao.addNewUser(user.name, user.email, user.password) != null) {
+            call.sessions.set(UserSession(id = user.userId))
+            call.respondText("Usuario adicionado com sucesso!\n", status = HttpStatusCode.Created)
+        }
     }
 }
 
