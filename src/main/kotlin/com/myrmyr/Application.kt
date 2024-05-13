@@ -1,5 +1,6 @@
 package com.myrmyr
 
+import com.myrmyr.dao.DatabaseSingleton
 import io.ktor.server.plugins.cors.routing.*
 import com.myrmyr.plugins.*
 import io.ktor.server.application.*
@@ -26,6 +27,7 @@ fun Application.module() {
     install(Sessions) {
         cookie<UserSession>("user_session", SessionStorageMemory())//,directorySessionStorage(File("build/.sessions")))
     }
+    DatabaseSingleton.init()
     configureSerialization()
     configureRouting()
 }
