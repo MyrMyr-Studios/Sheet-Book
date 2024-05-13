@@ -85,6 +85,8 @@ fun Route.addUser() {
             status = HttpStatusCode.Conflict
         )
         userStorage.add(user)
+        
+        // call.respond(user)
         call.respondText("Usuario adicionado com sucesso!\n", status = HttpStatusCode.Created)
     }
 }
@@ -105,6 +107,7 @@ fun Route.deleteUserById() {
         }
         sheetStorage.removeIf { it.ownerId == id.toInt() }
         userStorage.removeIf { it.userId == id.toInt() }
+        call.respondText("Usuario $id removido com sucesso\n", status = HttpStatusCode.Accepted)
     }
 }
 

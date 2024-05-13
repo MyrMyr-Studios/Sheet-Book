@@ -116,6 +116,7 @@ fun Route.deleteSheetById() {
         )
         campaignStorage.forEach { (_, _, _, sheetList): Campaign -> sheetList.removeIf { it == id.toInt() } }
         sheetStorage.removeIf { it.sheetId == id.toInt() }
+        call.respondText("Ficha $id removida com sucesso\n", status = HttpStatusCode.Accepted)
     }
 }
 
