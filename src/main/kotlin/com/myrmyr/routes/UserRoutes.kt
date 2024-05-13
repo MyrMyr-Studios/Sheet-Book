@@ -26,6 +26,13 @@ fun Route.userRouting() {
 // Devolve todos os usuarios salvos
 fun Route.listAllUsers() {
     get {
+        // check if user is logged in
+        val session = call.sessions.get<UserSession>()
+        println("session: $session")
+        if (session == null) {
+            call.respondText("Nao autorizado\n", status = HttpStatusCode.Unauthorized)
+            return@get
+        }
         val userList = dao.allUsers()
         if (userList.isEmpty()) {
             call.respond(userList)
@@ -44,6 +51,7 @@ fun Route.login() {
         if (user!!.password == password) {
             call.sessions.set(UserSession(id = user.userId))
             call.respondText("Login efetuado com sucesso\n", status = HttpStatusCode.OK)
+            println("session: ${call.sessions.get<UserSession>()}")
         } else call.respondText("Senha incorreta\n", status = HttpStatusCode.Unauthorized)
     }
 }

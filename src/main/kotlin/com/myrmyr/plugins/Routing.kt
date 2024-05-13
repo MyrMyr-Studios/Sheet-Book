@@ -11,9 +11,6 @@ import java.io.File
 
 fun Application.configureRouting() {
     routing {
-        get("/") {
-            call.respondText("Hello, world!")
-        }
         userRouting()
         sheetRouting()
         campaignRouting()

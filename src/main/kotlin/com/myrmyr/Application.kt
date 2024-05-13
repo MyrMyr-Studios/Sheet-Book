@@ -6,11 +6,10 @@ import com.myrmyr.plugins.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.HttpHeaders
 import io.ktor.server.sessions.*
 
-data class UserSession(val id: Int) 
+data class UserSession(val id: Int)
 
 fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)

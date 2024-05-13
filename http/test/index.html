@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sheet Book Test</title>
+  </head>
+  
+  <body>
+    <div class="container">
+      <label for="email"><b>Email</b></label>
+      <input type="email" placeholder="Enter Email" name="email" required>
+      
+      <label for="uname"><b>Username</b></label>
+      <input type="text" placeholder="Enter Username" name="uname" required>
+      
+      <label for="psw"><b>Password</b></label>
+      <input type="password" placeholder="Enter Password" name="psw" required>
+      
+      <button onclick="login()">Login</button>
+      <button onclick="signUp()">Sign up</button>
+      
+    </div>
+
+    </br>
+    <button onclick="fetchData()">Fetch Data</button>
+    
+    <div id="result"></div>
+
+    <script>
+      const request = (url, params = {}, method = 'GET', headers = {}) => {
+        let options = {method};
+        options.headers = headers;
+        if ('GET' === method) {
+            url += '?' + (new URLSearchParams(params)).toString();
+        } else {
+            options.body = JSON.stringify(params);
+        }
+        return fetch(url, options);
+      };
+      const get = (url, params, headers) => request(url, params, 'GET', headers);
+      const post = (url, params, headers) => request(url, params, 'POST', headers);
+
+      function fetchData() {
+        get('http://localhost:8080/users').then(response => {
+          if (response.ok) {
+            return response.json();
+          }
+          return response.text();
+        }).then(data => {
+          try {
+            document.getElementById('result').innerHTML = data;
+          } catch (error) {
+            document.getElementById('result').innerHTML = JSON.stringify(data);
+          } 
+        })
+      }
+
+      function login() {
+        email = document.getElementsByName('email')[0].value
+        password = document.getElementsByName('psw')[0].value
+        if (email == '' || password == '') {
+          alert('Preencha os campos')
+          return
+        }
+
+        get('http://localhost:8080/login', {'email': email, 'password': password}).then(response => response.text()).then(data => {
+          document.getElementById('result').innerHTML = data;
+        }).catch(error => {
+          console.error('Error:', error);
+        });
+      }
+
+      function signUp() {
+        username = document.getElementsByName('uname')[0].value
+        email = document.getElementsByName('email')[0].value
+        password = document.getElementsByName('psw')[0].value
+        if (username == '' || password == '' || email == '') {
+          alert('Preencha os campos')
+          return
+        }
+
+        post('http://localhost:8080/login', {'name': username, 'email': email, 'password': password}, {'Content-Type': 'application/json'}
+        ).then(response => response.text()).then(data => {
+          document.getElementById('result').innerHTML = data;
+        }).catch(error => {
+          console.error('Error:', error);
+        });
+      }
+      </script>
+      </body>
+      
+</html>
