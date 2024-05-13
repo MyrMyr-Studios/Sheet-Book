@@ -14,23 +14,13 @@ import com.myrmyr.UserSession
 fun Route.userRouting() {
     route("/users") {
         listAllUsers()
-        getUserById()
-        addUser()
-        getUserByEmail()
-        deleteUserById()
-        checkPassword()
-
+    }
+    route("/login") {
         login()
+        signUp()
+        logout()
     }
 }
-
-// Gambiarrada pra nao mandar a senha junto
-@Serializable
-data class UserWithoutPassword(
-    val id: Int,
-    val name: String,
-    val email: String
-)
 
 // Devolve todos os usuarios salvos
 fun Route.listAllUsers() {
@@ -43,40 +33,20 @@ fun Route.listAllUsers() {
     }
 }
 
-// Devolve o usuario com o id especificado
-fun Route.getUserById() {
-    get("id={id?}") {
-        val id = call.parameters["id"] ?: return@get call.respondText(
-            "ID faltando\n",
-            status = HttpStatusCode.BadRequest
-        )
-        val user = userStorage.find { it.userId == id.toInt() } ?: return@get call.respondText(
-            "Sem usuario com o ID $id\n",
-            status = HttpStatusCode.NotFound
-        )
-        val uwp = UserWithoutPassword(user.userId, user.name, user.email)
-        call.respond(uwp)
+fun Route.login() {
+    get {
+        val email = URLDecoder.decode(call.parameters["email"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
+        val password = URLDecoder.decode(call.parameters["password"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
+        userStorage.find { it.email == email }?.let {
+            if (it.password == password) {
+                call.sessions.set(UserSession(id = it.userId))
+                call.respondText("Login efetuado com sucesso\n", status = HttpStatusCode.OK)
+            } else call.respondText("Senha incorreta\n", status = HttpStatusCode.Unauthorized)
+        } ?: call.respondText("Usuario nao encontrado\n", status = HttpStatusCode.NotFound)
     }
 }
 
-// Devolve o usuario com o email especificado
-fun Route.getUserByEmail() {
-    get("email={email?}") {
-        val email = URLDecoder.decode(call.parameters["email"], "UTF-8") ?: return@get call.respondText(
-            "E-mail faltando\n",
-            status = HttpStatusCode.BadRequest
-        )
-        val user = userStorage.find { it.email == email } ?: return@get call.respondText(
-            "Sem usuario com o e-mail $email\n",
-            status = HttpStatusCode.NotFound
-        )
-        val uwp = UserWithoutPassword(user.userId, user.name, user.email)
-        call.respond(uwp)
-    }
-}
-
-// Adiciona o usuario
-fun Route.addUser() {
+fun Route.signUp() {
     post {
         val user = call.receive<User>()
         var maxId = -1
@@ -89,75 +59,14 @@ fun Route.addUser() {
             status = HttpStatusCode.Conflict
         )
         userStorage.add(user)
+        call.sessions.set(UserSession(id = user.userId))
         call.respondText("Usuario adicionado com sucesso!\n", status = HttpStatusCode.Created)
     }
 }
 
-// Deleta o usuario com o id especificado
-fun Route.deleteUserById() {
-    delete("{id?}") {
-        val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
-        if (userStorage.find { it.userId == id.toInt() } == null) return@delete call.respondText(
-            "Usuario $id nao existe\n",
-            status = HttpStatusCode.NotFound
-        )
-        campaignStorage.forEach { (_, _, userList): Campaign -> userList.removeIf { it == id.toInt() } }
-        sheetStorage.forEach { (ownerId, targetId): Sheet ->
-            if (ownerId == id.toInt()) {
-                campaignStorage.forEach { it: Campaign -> it.sheetList.removeIf { it == targetId } }
-            }
-        }
-        sheetStorage.removeIf { it.ownerId == id.toInt() }
-        userStorage.removeIf { it.userId == id.toInt() }
-        call.respondText("Usuario $id removido com sucesso\n", status = HttpStatusCode.Accepted)
+fun Route.logout() {
+    get {
+        call.sessions.clear<UserSession>()
+        call.respondText("Logout efetuado com sucesso\n", status = HttpStatusCode.OK)
     }
 }
-
-// Devolve True se a tentativa de senha corresponde a senha do usuario, falso c.c.
-fun Route.checkPassword() {
-    get("id={id?}/password={password?}") {
-        val id = call.parameters["id"] ?: return@get call.respond(HttpStatusCode.BadRequest)
-        if (userStorage.find { it.userId == id.toInt() } == null) return@get call.respondText(
-            "Usuario $id nao existe\n",
-            status = HttpStatusCode.NotFound
-        )
-        val user = userStorage.find { it.userId == id.toInt() }
-        val password = URLDecoder.decode(call.parameters["password"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
-        if (password == user?.password) {
-            call.respond(true)
-        } else call.respond(false)
-    }
-}
-
-fun Route.login() {
-    get("login") {
-        val email = URLDecoder.decode(call.parameters["email"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
-        val password = URLDecoder.decode(call.parameters["password"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
-        userStorage.find { it.email == email }?.let {
-            if (it.password == password) {
-                call.sessions.set(UserSession(id = it.userId))
-                call.respondText("Login efetuado com sucesso\n", status = HttpStatusCode.OK)
-            } else call.respondText("Senha incorreta\n", status = HttpStatusCode.Unauthorized)
-        } ?: call.respondText("Usuario nao encontrado\n", status = HttpStatusCode.NotFound)
-    }
-}
-
-// get("/login") {
-//     call.sessions.set(UserSession(id = "123abc", count = 0))
-//     call.respondRedirect("/user")
-// }
-
-// get("/user") {
-//     val userSession = call.sessions.get<UserSession>()
-//     if (userSession != null) {
-//         call.sessions.set(userSession.copy(count = userSession.count + 1))
-//         call.respondText("Session ID is ${userSession.id}. Reload count is ${userSession.count}.")
-//     } else {
-//         call.respondText("Session doesn't exist or is expired.")
-//     }
-// }
-
-// get("/logout") {
-//     call.sessions.clear<UserSession>()
-//     call.respondRedirect("/user")
-// }
