@@ -8,6 +8,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import java.net.URLDecoder
+import io.ktor.server.sessions.*
+import com.myrmyr.UserSession
 
 fun Route.userRouting() {
     route("/users") {
@@ -17,6 +19,8 @@ fun Route.userRouting() {
         getUserByEmail()
         deleteUserById()
         checkPassword()
+
+        login()
     }
 }
 
@@ -85,8 +89,6 @@ fun Route.addUser() {
             status = HttpStatusCode.Conflict
         )
         userStorage.add(user)
-        
-        // call.respond(user)
         call.respondText("Usuario adicionado com sucesso!\n", status = HttpStatusCode.Created)
     }
 }
@@ -126,3 +128,36 @@ fun Route.checkPassword() {
         } else call.respond(false)
     }
 }
+
+fun Route.login() {
+    get("login") {
+        val email = URLDecoder.decode(call.parameters["email"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
+        val password = URLDecoder.decode(call.parameters["password"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
+        userStorage.find { it.email == email }?.let {
+            if (it.password == password) {
+                call.sessions.set(UserSession(id = it.userId))
+                call.respondText("Login efetuado com sucesso\n", status = HttpStatusCode.OK)
+            } else call.respondText("Senha incorreta\n", status = HttpStatusCode.Unauthorized)
+        } ?: call.respondText("Usuario nao encontrado\n", status = HttpStatusCode.NotFound)
+    }
+}
+
+// get("/login") {
+//     call.sessions.set(UserSession(id = "123abc", count = 0))
+//     call.respondRedirect("/user")
+// }
+
+// get("/user") {
+//     val userSession = call.sessions.get<UserSession>()
+//     if (userSession != null) {
+//         call.sessions.set(userSession.copy(count = userSession.count + 1))
+//         call.respondText("Session ID is ${userSession.id}. Reload count is ${userSession.count}.")
+//     } else {
+//         call.respondText("Session doesn't exist or is expired.")
+//     }
+// }
+
+// get("/logout") {
+//     call.sessions.clear<UserSession>()
+//     call.respondRedirect("/user")
+// }
