@@ -85,7 +85,6 @@ fun Route.addUser() {
             status = HttpStatusCode.Conflict
         )
         userStorage.add(user)
-        call.respond(user)
         call.respondText("Usuario adicionado com sucesso!\n", status = HttpStatusCode.Created)
     }
 }
