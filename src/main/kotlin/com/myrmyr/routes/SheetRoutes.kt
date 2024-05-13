@@ -75,7 +75,7 @@ fun Route.getSheetByUserIdAndName() {
             "Nome do personagem faltando\n",
             status = HttpStatusCode.BadRequest
         )
-        if (userStorage.find { it.id == userId.toInt() } == null) return@get call.respondText(
+        if (userStorage.find { it.userId == userId.toInt() } == null) return@get call.respondText(
             "Usuario $userId nao existe\n",
             status = HttpStatusCode.NotFound
         )
@@ -92,7 +92,7 @@ fun Route.getSheetByUserIdAndName() {
 fun Route.addSheet() {
     post {
         val sheet = call.receive<Sheet>()
-        if (userStorage.find { it.id == sheet.ownerId } == null) return@post call.respondText(
+        if (userStorage.find { it.userId == sheet.ownerId } == null) return@post call.respondText(
             "Usuario ${sheet.ownerId} nao existe\n",
             status = HttpStatusCode.NotFound
         )

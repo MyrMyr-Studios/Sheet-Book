@@ -46,11 +46,11 @@ fun Route.getUserById() {
             "ID faltando\n",
             status = HttpStatusCode.BadRequest
         )
-        val user = userStorage.find { it.id == id.toInt() } ?: return@get call.respondText(
+        val user = userStorage.find { it.userId == id.toInt() } ?: return@get call.respondText(
             "Sem usuario com o ID $id\n",
             status = HttpStatusCode.NotFound
         )
-        val uwp = UserWithoutPassword(user.id, user.name, user.email)
+        val uwp = UserWithoutPassword(user.userId, user.name, user.email)
         call.respond(uwp)
     }
 }
@@ -66,7 +66,7 @@ fun Route.getUserByEmail() {
             "Sem usuario com o e-mail $email\n",
             status = HttpStatusCode.NotFound
         )
-        val uwp = UserWithoutPassword(user.id, user.name, user.email)
+        val uwp = UserWithoutPassword(user.userId, user.name, user.email)
         call.respond(uwp)
     }
 }
@@ -77,9 +77,9 @@ fun Route.addUser() {
         val user = call.receive<User>()
         var maxId = -1
         userStorage.forEach {
-            maxId = if (it.id > maxId) it.id else maxId
+            maxId = if (it.userId > maxId) it.userId else maxId
         }
-        user.id = if (userStorage.isEmpty()) 0 else maxId + 1
+        user.userId = if (userStorage.isEmpty()) 0 else maxId + 1
         if (userStorage.find { it.email == user.email } != null) return@post call.respondText(
             "Email ja utilizado\n",
             status = HttpStatusCode.Conflict
@@ -94,7 +94,7 @@ fun Route.addUser() {
 fun Route.deleteUserById() {
     delete("{id?}") {
         val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
-        if (userStorage.find { it.id == id.toInt() } == null) return@delete call.respondText(
+        if (userStorage.find { it.userId == id.toInt() } == null) return@delete call.respondText(
             "Usuario $id nao existe\n",
             status = HttpStatusCode.NotFound
         )
@@ -105,7 +105,7 @@ fun Route.deleteUserById() {
             }
         }
         sheetStorage.removeIf { it.ownerId == id.toInt() }
-        userStorage.removeIf { it.id == id.toInt() }
+        userStorage.removeIf { it.userId == id.toInt() }
     }
 }
 
@@ -113,11 +113,11 @@ fun Route.deleteUserById() {
 fun Route.checkPassword() {
     get("id={id?}/password={password?}") {
         val id = call.parameters["id"] ?: return@get call.respond(HttpStatusCode.BadRequest)
-        if (userStorage.find { it.id == id.toInt() } == null) return@get call.respondText(
+        if (userStorage.find { it.userId == id.toInt() } == null) return@get call.respondText(
             "Usuario $id nao existe\n",
             status = HttpStatusCode.NotFound
         )
-        val user = userStorage.find { it.id == id.toInt() }
+        val user = userStorage.find { it.userId == id.toInt() }
         val password = URLDecoder.decode(call.parameters["password"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
         if (password == user?.password) {
             call.respond(true)

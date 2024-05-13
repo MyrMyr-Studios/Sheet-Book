@@ -76,7 +76,7 @@ fun Route.getUserCampaigns() {
             "ID do usuario faltando\n",
             status = HttpStatusCode.BadRequest
         )
-        if (userStorage.find { it.id == userId.toInt() } == null) return@get call.respondText(
+        if (userStorage.find { it.userId == userId.toInt() } == null) return@get call.respondText(
             "Usuario $userId nao existe\n",
             status = HttpStatusCode.NotFound
         )
@@ -131,7 +131,7 @@ fun Route.addUserIdToCampaign() {
         data class Gambiarra(val userId: Int)
         val userId = call.receive<Gambiarra>().userId
 
-        if (userStorage.find { it.id == userId } == null) return@post call.respondText(
+        if (userStorage.find { it.userId == userId } == null) return@post call.respondText(
             "Usuario $userId nao existe\n",
             status = HttpStatusCode.NotFound
         )
@@ -157,7 +157,7 @@ fun Route.deleteUserIdFromCampaign() {
         )
         val campaign = campaignStorage.find { it.campaignId == campaignId.toInt() }
         val userId = call.parameters["userId"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
-        if (userStorage.find { it.id == userId.toInt() } == null) return@delete call.respondText(
+        if (userStorage.find { it.userId == userId.toInt() } == null) return@delete call.respondText(
             "Usuario $userId nao existe\n",
             status = HttpStatusCode.NotFound
         )
