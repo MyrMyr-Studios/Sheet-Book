@@ -1,11 +1,13 @@
 package com.myrmyr.models
 
 import kotlinx.serialization.Serializable
+import org.jetbrains.exposed.sql.*
 
 @Serializable
 data class Sheet (
     val ownerId: Int,
     var sheetId: Int = -1,
+    var campaignId: Int = -1,
     val name: String,
     val level: Int,
     val class_t: String,
@@ -45,3 +47,47 @@ data class Sheet (
 ) {}
 
 val sheetStorage = mutableListOf<Sheet>()
+
+object Sheets: Table() {
+    val ownerId = reference("ownerId", Users.userId)
+    val sheetId = integer("sheetId").autoIncrement()
+    val campaignId = integer("campaignId")
+    val name = varchar("name", 64)
+    val level = integer("level")
+    val class_t = varchar("class", 48)
+    val background = varchar("background", 128)
+    val race = varchar("race", 48)
+    val alignment = varchar("alignment", 48)
+    val xp = integer("xp")
+    val strength = integer("strength")
+    val dexterity = integer("dexterity")
+    val constitution = integer("constitution")
+    val intelligence = integer("intelligence")
+    val wisdom = integer("wisdom")
+    val charisma = integer("charisma")
+    val inspiration = varchar("inspiration", 48)
+    val proficiencyPoints = integer("proficiencyPoints")
+    val armorClass = integer("armorClass")
+    val initiative = integer("initiative")
+    val speed = integer("speed")
+    val personalityTraits = varchar("personalityTraits", 256)
+    val ideals = varchar("ideals", 256)
+    val bonds = varchar("bonds", 256)
+    val flaws = varchar("flaws", 256)
+    val features = varchar("features", 256)
+    val traits = varchar("traits", 256)
+    val equipment = varchar("equipment", 512)
+    val proficiencies = varchar("proficiencies", 256)
+    val perception = varchar("perception", 64)
+    val languages = varchar("languages", 256)
+    val hp = integer("hp")
+    val temporaryHp = integer("temporaryHp")
+    val hitDice = varchar("hitDice", 48)
+    val deathSaves = varchar("deathSaves", 48)
+    val attacks = varchar("attacks", 1024)
+    val spellcasting = varchar("spellcasting", 1024)
+    val skills = varchar("skills", 1024)
+    val savingThrows = varchar("savingThrows", 64)
+
+    override val primaryKey = PrimaryKey(sheetId)
+}
