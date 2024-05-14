@@ -2,7 +2,6 @@ package com.myrmyr.dao
 
 import com.myrmyr.dao.DatabaseSingleton.dbQuery
 import com.myrmyr.models.*
-import kotlinx.coroutines.selects.select
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 
