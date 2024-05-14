@@ -6,11 +6,12 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.Serializable
 import java.net.URLDecoder
 import io.ktor.server.sessions.*
 import com.myrmyr.UserSession
 import com.myrmyr.dao.*
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
 
 fun Route.userRouting() {
     route("/users") {
@@ -26,18 +27,17 @@ fun Route.userRouting() {
 // Devolve todos os usuarios salvos
 fun Route.listAllUsers() {
     get {
-        // check if user is logged in
         val session = call.sessions.get<UserSession>()
-        println("session: $session")
         if (session == null) {
             call.respondText("Nao autorizado\n", status = HttpStatusCode.Unauthorized)
             return@get
         }
         val userList = dao.allUsers()
         if (userList.isEmpty()) {
-            call.respond(userList)
+            call.respondText("Sem usuarios\n", status = HttpStatusCode.NotFound)
         } else {
-            call.respondText("Sem usuarios\n", status = HttpStatusCode.OK)
+            call.response.status(HttpStatusCode.OK)
+            call.respond(Json.encodeToString(userList))
         }
     }
 }
@@ -51,7 +51,6 @@ fun Route.login() {
         if (user!!.password == password) {
             call.sessions.set(UserSession(id = user.userId))
             call.respondText("Login efetuado com sucesso\n", status = HttpStatusCode.OK)
-            println("session: ${call.sessions.get<UserSession>()}")
         } else call.respondText("Senha incorreta\n", status = HttpStatusCode.Unauthorized)
     }
 }

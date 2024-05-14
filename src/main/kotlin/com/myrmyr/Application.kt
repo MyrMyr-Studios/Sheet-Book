@@ -22,6 +22,7 @@ fun Application.module() {
         allowHeader(HttpHeaders.ContentType)
         allowHeader("X-Requested-With")
         allowHeader(HttpHeaders.Origin)
+        allowCredentials = true 
     }
     install(Sessions) {
         cookie<UserSession>("user_session", SessionStorageMemory())//,directorySessionStorage(File("build/.sessions")))
