@@ -49,9 +49,9 @@
           return response.text();
         }).then(data => {
           try {
-            document.getElementById('result').innerHTML = data;
-          } catch (error) {
             document.getElementById('result').innerHTML = JSON.stringify(data);
+          } catch (error) {
+            document.getElementById('result').innerHTML = data
           } 
         })
       }

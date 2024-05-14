@@ -25,7 +25,9 @@ fun Application.module() {
         allowCredentials = true 
     }
     install(Sessions) {
-        cookie<UserSession>("user_session", SessionStorageMemory())//,directorySessionStorage(File("build/.sessions")))
+        cookie<UserSession>("user_session", SessionStorageMemory()){//,directorySessionStorage(File("build/.sessions")))
+            cookie.secure = true
+        }
     }
     DatabaseSingleton.init()
     configureSerialization()
