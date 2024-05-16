@@ -46,6 +46,13 @@ class DAOFacadeImpl : DAOFacade {
             .singleOrNull()
     }
 
+    override suspend fun findUserById(userId: Int): User? = dbQuery {
+        Users
+            .select { Users.userId eq userId }
+            .map(::resultRowToUser)
+            .singleOrNull()
+    }
+
     // Sheet
     private fun resultRowToSheet(row: ResultRow) = Sheet(
         ownerId = row[Sheets.ownerId],
@@ -208,6 +215,89 @@ class DAOFacadeImpl : DAOFacade {
             .select { Sheets.campaignId eq campaignId }
             .map(::resultRowToSheet)
     }.toMutableList()
+
+    // Campaigns
+    private fun resultRowToCampaign(row: ResultRow) = Campaign(
+        campaignId = row[Campaigns.campaignId],
+        name = row[Campaigns.name],
+        userList = RelationUserCampaign
+            .select { RelationUserCampaign.campaignId eq row[Campaigns.campaignId] }
+            .map { r: ResultRow -> r[RelationUserCampaign.userId] }
+            .toMutableList(),
+        sheetList = Sheets
+            .select { Sheets.campaignId eq row[Campaigns.campaignId] }
+            .map { r: ResultRow -> r[Sheets.sheetId] }
+            .toMutableList()
+    )
+
+    override suspend fun allCampaigns(): MutableList<Campaign> = dbQuery {
+        Campaigns.selectAll().map(::resultRowToCampaign)
+    }.toMutableList()
+
+    override suspend fun addNewCampaign(name: String): Campaign? = dbQuery {
+        val insertStatement = Campaigns.insert {
+            it[Campaigns.name] = name
+        }
+        insertStatement.resultedValues?.singleOrNull()?.let(::resultRowToCampaign)
+    }
+
+    override suspend fun deleteCampaign(campaignId: Int): Boolean = dbQuery {
+        (Campaigns.deleteWhere { Campaigns.campaignId eq campaignId } > 0) and (RelationUserCampaign.deleteWhere { RelationUserCampaign.campaignId eq campaignId } > 0)
+    }
+
+    override suspend fun findCampaignById(campaignId: Int): Campaign? = dbQuery {
+        Campaigns
+            .select { Campaigns.campaignId eq campaignId }
+            .map(::resultRowToCampaign)
+            .singleOrNull()
+    }
+
+    override suspend fun findCampaignByName(name: String): MutableList<Campaign> = dbQuery {
+        Campaigns
+            .select { Campaigns.name eq name }
+            .map(::resultRowToCampaign)
+            .toMutableList()
+    }
+
+    override suspend fun changeSheetCampaign(sheetId: Int, campaignId: Int): Boolean = dbQuery {
+        Sheets.update({ Sheets.sheetId eq sheetId }) {
+            it[Sheets.campaignId] = campaignId
+        } > 0
+    }
+
+    override suspend fun getCampaignSheets(campaignId: Int): MutableList<Sheet> = dbQuery {
+        Sheets
+            .select { Sheets.campaignId eq campaignId }
+            .map(::resultRowToSheet)
+            .toMutableList()
+    }
+
+    override suspend fun addUserToCampaign(userId: Int, campaignId: Int): Boolean = dbQuery {
+        val insertStatement = RelationUserCampaign.insert {
+            it[RelationUserCampaign.userId] = userId
+            it[RelationUserCampaign.campaignId] = campaignId
+        }
+        insertStatement.resultedValues?.singleOrNull()?.let { true } ?: false
+    }
+
+    override suspend fun removeUserFromCampaign(userId: Int, campaignId: Int): Boolean = dbQuery {
+        RelationUserCampaign
+            .deleteWhere { (RelationUserCampaign.campaignId eq campaignId) and (RelationUserCampaign.userId eq userId) } > 0
+    }
+
+    override suspend fun getCampaignUsers(campaignId: Int): MutableList<Int> = dbQuery {
+        RelationUserCampaign
+            .select { RelationUserCampaign.campaignId eq campaignId }
+            .map { resultRow: ResultRow -> resultRow[RelationUserCampaign.userId] }
+            .toMutableList()
+    }
+
+    override suspend fun getUserCampaigns(userId: Int): MutableList<Int> = dbQuery {
+        RelationUserCampaign
+            .select { RelationUserCampaign.userId eq userId }
+            .map { resultRow: ResultRow -> resultRow[RelationUserCampaign.userId] }
+            .toMutableList()
+    }
 }
 
 val dao: DAOFacade = DAOFacadeImpl()

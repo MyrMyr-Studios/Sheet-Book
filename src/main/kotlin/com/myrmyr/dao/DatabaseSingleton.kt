@@ -14,6 +14,8 @@ object DatabaseSingleton {
         transaction(database) {
             SchemaUtils.create(Users)
             SchemaUtils.create(Sheets)
+            SchemaUtils.create(Campaigns)
+            SchemaUtils.create(RelationUserCampaign)
         }
     }
 

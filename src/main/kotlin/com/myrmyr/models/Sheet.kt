@@ -5,7 +5,7 @@ import org.jetbrains.exposed.sql.*
 
 @Serializable
 data class Sheet (
-    val ownerId: Int,
+    var ownerId: Int = -1,
     var sheetId: Int = -1,
     var campaignId: Int = -1,
     val name: String,
@@ -51,7 +51,7 @@ val sheetStorage = mutableListOf<Sheet>()
 object Sheets: Table() {
     val ownerId = reference("ownerId", Users.userId)
     val sheetId = integer("sheetId").autoIncrement()
-    val campaignId = integer("campaignId")
+    val campaignId = reference("campaignId", Campaigns.campaignId)
     val name = varchar("name", 64)
     val level = integer("level")
     val class_t = varchar("class", 48)
