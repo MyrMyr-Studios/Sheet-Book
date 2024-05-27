@@ -9,9 +9,26 @@ services:
       - 8080:8080
     volumes:
       - ./app:/app
-    expose:
-      - 8080
     command: ./gradlew run
+  
+  web:
+    build: ./web
+    container_name: sheet-book-cli
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    networks:
+      - sheet-book
+    ports:
+      - 8000:8000
+    volumes:
+      - type: bind
+        source: ./web
+        target: /app
+    expose:
+      - 8000
 
 networks:
   sheet-book:
