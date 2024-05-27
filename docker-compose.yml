@@ -1,0 +1,19 @@
+services:
+  app:
+    build: ./app
+    container_name: sheet-book-app
+    restart: unless-stopped
+    networks:
+      - sheet-book
+    ports:
+      - 8080:8080
+    volumes:
+      - ./app:/app
+    expose:
+      - 8080
+    command: ./gradlew run
+
+networks:
+  sheet-book:
+    name: sheet-book
+    driver: bridge

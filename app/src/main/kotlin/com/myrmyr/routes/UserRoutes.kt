@@ -37,8 +37,7 @@ fun Route.listAllUsers() {
         if (userList.isEmpty()) {
             call.respondText("Sem usuarios\n", status = HttpStatusCode.NotFound)
         } else {
-            call.response.status(HttpStatusCode.OK)
-            call.respond(Json.encodeToString(userList))
+            call.respond(HttpStatusCode.OK, Json.encodeToString(userList))
         }
     }
 }
