@@ -16,5 +16,11 @@ Sheet Book é uma aplicação web desenvolvida utilizando o framework **Ktor** p
 ## Como usar?
 Utilizando a página web do projeto será possível realizar login para ter acesso a todas as funcionalidades dele, mantendo salva suas criações na núvem para poder editá-las de qualquer lugar.
 
+Para executar tanto o servidor quanto o cliente web basta utilizar o seguinte comando na pasta raiz do projeto:
+
+```bash
+make
+```
+
 ## Desenvolvimento
 [UML base das Classes do projeto](../../wiki/Arquitetura-de-Classes-do-Projeto)
