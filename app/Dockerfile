@@ -1,7 +1,11 @@
 FROM openjdk:19-jdk-alpine3.16
 
-RUN apk add --no-cache bash
+RUN mkdir /app
 
 WORKDIR /app
 
-CMD ./gradlew run
+RUN apk add --no-cache bash 
+
+COPY . /app
+
+CMD ["./gradlew", "run"]

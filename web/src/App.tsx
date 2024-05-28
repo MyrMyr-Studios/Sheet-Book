@@ -69,7 +69,7 @@ function App() {
         <Button className="btn btn-primary" onClick={register}>Register</Button>
       </div>
       <div className="flex w-full p-4 items-center justify-center gap-2">
-        <Button className="btn btn-secondary" onClick={getUserList}>Fetch data</Button>
+        <Button className="btn btn-secondary" size="lg" onClick={getUserList}>Fetch data</Button>
       </div>
       <div className="mt-10">{userList}</div>
     </>

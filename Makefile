@@ -2,10 +2,10 @@
 
 all:
 	docker compose up app --build --detach
-	docker compose up web --detach
+	docker compose up web --build --detach
 
 frontend:
-	docker compose up web --detach
+	docker compose up web --build --detach
 
 backend:
 	docker compose up app --build --detach
