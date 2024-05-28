@@ -27,6 +27,7 @@ services:
       - type: bind
         source: ./web
         target: /app
+      - /app/node_modules
     expose:
       - 8000
 
