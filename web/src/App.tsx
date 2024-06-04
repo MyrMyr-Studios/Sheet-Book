@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Blogs from "./pages/blogs";
+import Register from "./pages/register";
 import Home from "./pages/home";
-import Layout from "./pages/layout";
 import axios from 'axios'
 
 axios.defaults.baseURL = 'http://localhost:8080'
@@ -12,7 +11,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route index element={<Home />} />
-        <Route path="blogs" element={<Blogs />} />
+        <Route path="register" element={<Register />} />
       </Routes>
     </BrowserRouter>
   )
