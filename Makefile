@@ -10,6 +10,12 @@ frontend:
 backend:
 	docker compose up app --build --detach
 
+debug-frontend:
+	docker compose up app
+	
+debug-backend:
+	docker compose up web
+
 down:
 	docker compose down
 
