@@ -15,8 +15,8 @@ import kotlinx.serialization.encodeToString
 
 
 fun Route.userRouting() {
-    route("/users") {
-        listAllUsers()
+    route("/user") {
+        getUsername()
     }
     route("/login") {
         login()
@@ -25,20 +25,15 @@ fun Route.userRouting() {
     }
 }
 
-// Devolve todos os usuarios salvos
-fun Route.listAllUsers() {
+fun Route.getUsername() {
     get {
         val session = call.sessions.get<UserSession>()
         if (session == null) {
-            call.respondText("Nao autorizado\n", status = HttpStatusCode.Unauthorized)
+            call.respond(HttpStatusCode.BadRequest, "Usuario nao logado\n")
             return@get
         }
-        val userList = dao.allUsers()
-        if (userList.isEmpty()) {
-            call.respondText("Sem usuarios\n", status = HttpStatusCode.NotFound)
-        } else {
-            call.respond(HttpStatusCode.OK, Json.encodeToString(userList))
-        }
+        val user = dao.findUserById(session.id)
+        call.respond(HttpStatusCode.OK, Json.encodeToString(user))
     }
 }
 
