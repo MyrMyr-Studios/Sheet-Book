@@ -16,10 +16,10 @@ const Home = () => {
 
   const getLoggedInUser = () => {
     axios
-      .get('/users')
+      .get('/user')
       .then((response) => {
         if (response.status === 200) {
-          console.log(response.data)
+          setUsername(response.data)
         }
       }, (error) => {
         console.log(error.request.response)
@@ -31,7 +31,7 @@ const Home = () => {
       .get('/login', {params: {email: email, password: password}})
       .then((response) => {
         if (response.status === 200) {
-          console.log(username)
+          getLoggedInUser();
         }
       }, (error) => {
         console.log(error.request.response)
