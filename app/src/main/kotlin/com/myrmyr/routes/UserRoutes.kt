@@ -56,7 +56,9 @@ fun Route.signUp() {
         val user = call.receive<User>()
         if (dao.findUserByEmail(user.email) != null) return@post call.respond(HttpStatusCode.Conflict)
         if (dao.addNewUser(user.name, user.email, user.password) != null) {
-            call.sessions.set(UserSession(id = user.userId))
+            val db_user = dao.findUserByEmail(user.email)
+            if (db_user == null) return@post call.respond(HttpStatusCode.InternalServerError)
+            call.sessions.set(UserSession(id = db_user.userId))
             call.respond(HttpStatusCode.Created)
         }
     }
