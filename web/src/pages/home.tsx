@@ -93,17 +93,14 @@ function Home() {
           <span className="material-icons text-primary-content" style={{lineHeight: "1rem"}}>expand_more</span>
         </Button>
         <Dropdown.Menu className="mt-3 z-[1] w-52 menu-sm">
-          {/* <div className="flex items-center justify-center gap-2">
-            <Button className="btn btn-primary" style={{width: "7rem"}} onClick={login}>Login</Button>
-            <Button className="btn btn-secondary" style={{width: "7rem"}} onClick={register}>Register</Button>
-          </div> */}
-
-          {/* <hr style={{marginTop: ".5rem", marginBottom: ".5rem"}}/> */}
+          <Dropdown.Item href='/sheets'>Sheets</Dropdown.Item>
+          <Dropdown.Item href='/campaigns'>Campaigns</Dropdown.Item>
+          <hr style={{marginTop: ".5rem", marginBottom: ".5rem"}}/>
           <li>
-            <a className="justify-between">
-              Profile
-              <Badge className="badge">New</Badge>
-            </a>
+              <a className="justify-between" href='/profile'>
+                Profile
+                <Badge className="badge">New</Badge>
+              </a>
           </li>
           <Dropdown.Item>Settings</Dropdown.Item>
           <Dropdown.Item onClick={loggout}>Logout</Dropdown.Item>
@@ -113,15 +110,15 @@ function Home() {
   )
 
   return (
-    <>
+    <div>
       <Navbar className='bg-primary shadow-xl justify-between' style={{padding: "1rem"}}>
         <div className="flex-none">
-          <img style={{height: "3rem"}} src="/sheet-book-white.png" />
-          <span className="text-primary-content" style={{paddingLeft: "1rem", fontWeight: "700", fontSize: "1.55rem"}}>Sheet Book</span>
+          <img style={{height: "3rem"}} src="/icon.svg" />
+          <span className="text-primary-content" style={{paddingLeft: "0.75rem", fontWeight: "700", fontSize: "1.55rem"}}>Sheet Book</span>
         </div>
         {username ? logged_dropdown : not_logged_dropdown}
       </Navbar>
-    </>
+    </div>
   )
 }
 
