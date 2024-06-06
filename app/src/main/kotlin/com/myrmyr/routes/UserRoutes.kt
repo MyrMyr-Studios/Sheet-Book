@@ -21,6 +21,8 @@ fun Route.userRouting() {
     route("/login") {
         login()
         signUp()
+    }
+    route("/logout") {
         logout()
     }
 }
@@ -28,12 +30,10 @@ fun Route.userRouting() {
 fun Route.getUsername() {
     get {
         val session = call.sessions.get<UserSession>()
-        if (session == null) {
-            call.respond(HttpStatusCode.BadRequest, "Usuario nao logado\n")
-            return@get
-        }
+        if (session == null) return@get call.respond(HttpStatusCode.BadRequest)
+
         val user = dao.findUserById(session.id)
-        call.respond(HttpStatusCode.OK, Json.encodeToString(user))
+        call.respond(HttpStatusCode.OK, Json.encodeToString(user!!.name))
     }
 }
 
@@ -42,24 +42,22 @@ fun Route.login() {
         val email = URLDecoder.decode(call.parameters["email"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
         val password = URLDecoder.decode(call.parameters["password"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
         val user = dao.findUserByEmail(email)
-        if (user == null) call.respondText("Usuario nao encontrado\n", status = HttpStatusCode.NotFound)
+        if (user == null) call.respond(HttpStatusCode.NotFound)
+
         if (user!!.password == password) {
             call.sessions.set(UserSession(id = user.userId))
-            call.respondText("Login efetuado com sucesso\n", status = HttpStatusCode.OK)
-        } else call.respondText("Senha incorreta\n", status = HttpStatusCode.Unauthorized)
+            call.respond(HttpStatusCode.OK)
+        } else call.respond(HttpStatusCode.Unauthorized)
     }
 }
 
 fun Route.signUp() {
     post {
         val user = call.receive<User>()
-        if (dao.findUserByEmail(user.email) != null) return@post call.respondText(
-            "Email ja utilizado\n",
-            status = HttpStatusCode.Conflict
-        )
+        if (dao.findUserByEmail(user.email) != null) return@post call.respond(HttpStatusCode.Conflict)
         if (dao.addNewUser(user.name, user.email, user.password) != null) {
             call.sessions.set(UserSession(id = user.userId))
-            call.respondText("Usuario adicionado com sucesso!\n", status = HttpStatusCode.Created)
+            call.respond(HttpStatusCode.Created)
         }
     }
 }
@@ -67,6 +65,6 @@ fun Route.signUp() {
 fun Route.logout() {
     get {
         call.sessions.clear<UserSession>()
-        call.respondText("Logout efetuado com sucesso\n", status = HttpStatusCode.OK)
+        call.respond(HttpStatusCode.OK)
     }
 }
