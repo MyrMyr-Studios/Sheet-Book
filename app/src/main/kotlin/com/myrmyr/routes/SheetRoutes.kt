@@ -1,21 +1,22 @@
 package com.myrmyr.routes
 
 import com.myrmyr.models.*
-//import com.typesafe.config.ConfigException.Null
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import java.net.URLDecoder
+import io.ktor.server.sessions.*
+import com.myrmyr.UserSession
 import com.myrmyr.dao.*
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
 
 
 fun Route.sheetRouting() {
     route("/sheets") {
-        listAllSheets()
+        listSheets()
         getSheetById()
         getSheetByUserId()
         getSheetByUserIdAndName()
@@ -25,21 +26,14 @@ fun Route.sheetRouting() {
     }
 }
 
-// Devolve todas as fichas armazenadas
-fun Route.listAllSheets() {
+fun Route.listSheets() {
     get {
-        val sheetList = dao.allSheets()
-        if (sheetList.isEmpty()) {
-            call.respondText("Sem fichas\n", status = HttpStatusCode.NotFound)
-        } else {
-            call.response.status(HttpStatusCode.OK)
-            call.respond(Json.encodeToString(sheetList))
-        }
-        /*if (sheetStorage.isNotEmpty()) {
-            call.respond(sheetStorage)
-        } else {
-            call.respondText("Sem fichas\n", status = HttpStatusCode.OK)
-        }*/
+        val session = call.sessions.get<UserSession>()
+        if (session == null)
+            return@get call.respond(HttpStatusCode.Unauthorized)
+        
+        val sheets = sheetStorage.filter { it.ownerId == session.id }
+        call.respond(HttpStatusCode.OK, Json.encodeToString(sheets))
     }
 }
 

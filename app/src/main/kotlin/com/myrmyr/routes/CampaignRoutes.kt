@@ -8,6 +8,8 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import java.net.URLDecoder
+import io.ktor.server.sessions.*
+import com.myrmyr.UserSession
 
 fun Route.campaignRouting() {
     route("/campaigns") {
