@@ -10,6 +10,9 @@ frontend:
 backend:
 	docker compose up app --build --detach
 
+tests:
+	docker compose up tests --build
+
 debug-frontend:
 	docker compose up web
 	

@@ -30,6 +30,16 @@ services:
     expose:
       - 8081
 
+  tests:
+    build: ./app
+    container_name: sheet-book-test
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    volumes:
+      - ./app:/app
+    command: ./gradlew test --tests "com.myrmyr.ApplicationTest"
+
 networks:
   sheet-book:
     name: sheet-book

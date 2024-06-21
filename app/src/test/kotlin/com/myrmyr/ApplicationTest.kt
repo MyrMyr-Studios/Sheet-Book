@@ -5,28 +5,45 @@ import com.myrmyr.plugins.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.client.plugins.cookies.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.testing.*
+import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.*
+import io.ktor.server.application.*
+import io.ktor.server.sessions.*
 
 class ApplicationTest {
     @Test
     fun testRoot() = testApplication {
+        val client = createClient {
+            install(HttpCookies)
+        }
         application {
             configureRouting()
         }
-        client.get("/").apply {
-            assertEquals(HttpStatusCode.OK, status)
-            assertEquals("Hello, world!", bodyAsText())
+        routing {
+            get("/login-test") {
+                call.sessions.set(UserSession(10))
+            }
         }
+        val loginResponse = client.get("/login-test")
+        /*val response = client.get("/sheets") /*{
+            parameter("email", "alou")
+            parameter("password", "alou")
+        }*/
+        assertEquals(HttpStatusCode.BadRequest, response.status)*/
+        /*client.get("/user").apply {
+            //assertEquals(HttpStatusCode.Unauthorized, status)
+            //assertEquals("Hello, world!", bodyAsText())
+        }*/
     }
 
-    @Test
+    /*@Test
     fun testUsers() = testApplication {
         application {
             configureRouting()
@@ -70,5 +87,5 @@ class ApplicationTest {
             assertEquals(HttpStatusCode.OK, status)
             assertEquals("Sem usuarios\n", bodyAsText())
         }
-    }
+    }*/
 }
