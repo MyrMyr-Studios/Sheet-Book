@@ -203,6 +203,12 @@ class DAOFacadeImpl : DAOFacade {
             .singleOrNull()
     }
 
+    override suspend fun findSheetByOwnerId(ownerId: Int): MutableList<Sheet> = dbQuery {
+        Sheets
+            .select { Sheets.ownerId eq ownerId }
+            .map(::resultRowToSheet)
+    }.toMutableList()
+
     override suspend fun findSheetByNameAndOwnerid(name: String, ownerId: Int): MutableList<Sheet> = dbQuery {
         Sheets
             .select { Sheets.ownerId eq ownerId }

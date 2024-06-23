@@ -17,6 +17,7 @@ interface DAOFacade {
     suspend fun editSheet(sheet: Sheet): Boolean
     suspend fun deleteSheet(sheetId: Int): Boolean // ! ! ! I N C O M P L E T A ! ! !
     suspend fun findSheetById(sheetId: Int): Sheet?
+    suspend fun findSheetByOwnerId(ownerId: Int): MutableList<Sheet>
     suspend fun findSheetByNameAndOwnerid(name: String, ownerId: Int): MutableList<Sheet>
     suspend fun findSheetByCampaign(campaignId: Int): MutableList<Sheet>
 

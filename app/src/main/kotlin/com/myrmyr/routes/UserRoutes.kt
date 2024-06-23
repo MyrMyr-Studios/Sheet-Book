@@ -42,7 +42,7 @@ fun Route.login() {
         val email = URLDecoder.decode(call.parameters["email"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
         val password = URLDecoder.decode(call.parameters["password"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
         val user = dao.findUserByEmail(email)
-        if (user == null) call.respond(HttpStatusCode.NotFound)
+        if (user == null) return@get call.respond(HttpStatusCode.NotFound)
 
         if (user!!.password == password) {
             call.sessions.set(UserSession(id = user.userId))

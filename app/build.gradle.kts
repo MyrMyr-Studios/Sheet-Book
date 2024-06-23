@@ -39,7 +39,14 @@ dependencies {
     implementation("io.ktor:ktor-server-sessions:$ktor_version")
     testImplementation("io.ktor:ktor-server-tests-jvm")
     testImplementation("io.ktor:ktor-server-test-host:$ktor_version")
-    testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    /*testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")*/
+    testImplementation(kotlin("test"))
     testImplementation("io.ktor:ktor-client-core:$ktor_version")
+    testImplementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }

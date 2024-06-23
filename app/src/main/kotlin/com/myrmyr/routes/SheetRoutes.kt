@@ -31,15 +31,14 @@ fun Route.listSheets() {
         val session = call.sessions.get<UserSession>()
         if (session == null)
             return@get call.respond(HttpStatusCode.Unauthorized)
-        
-        val sheets = sheetStorage.filter { it.ownerId == session.id }
+        val sheets = dao.findSheetByOwnerId(session.id)//sheetStorage.filter { it.ownerId == session.id }
         call.respond(HttpStatusCode.OK, Json.encodeToString(sheets))
     }
 }
 
 // Devolve a ficha com o ID especificado
 fun Route.getSheetById() {
-    get("{id?}") {
+    /*get("{id?}") {
         val id = call.parameters["id"] ?: return@get call.respondText(
             "ID faltando\n",
             status = HttpStatusCode.BadRequest
@@ -49,11 +48,20 @@ fun Route.getSheetById() {
             status = HttpStatusCode.NotFound
         )
         call.respond(sheet)
+    }*/
+    get {
+        val session = call.sessions.get<UserSession>()
+        if (session == null)
+            return@get call.respond(HttpStatusCode.Unauthorized)
+        val id = URLDecoder.decode(call.parameters["id"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
+        val sheet = dao.findSheetById(id)//sheetStorage.find { it.sheetId == id.toInt() } ?:
+        if(sheet == null) return@get call.respond(HttpStatusCode.NotFound)
+        call.respond(HttpStatusCode.OK, sheet)
     }
 }
 
 // Devolve todas as fichas do usuario especificado
-fun Route.getSheetByUserId() {
+/*fun Route.getSheetByUserId() {
     get("userSheets/{userId?}") {
         val userId = call.parameters["userId"] ?: return@get call.respondText(
             "ID do usuario faltando\n",
@@ -66,10 +74,10 @@ fun Route.getSheetByUserId() {
         )
         call.respond(sheets)
     }
-}
+}*/
 
 // Devolve todas as fichas com o nome especificdo do usuario especificado
-fun Route.getSheetByUserIdAndName() {
+/*fun Route.getSheetByUserIdAndName() {
     get("userSheets/{userId?}/{sheetName?}") {
         val userId = call.parameters["userId"] ?: return@get call.respondText(
             "ID do usuario faltando\n",
@@ -90,12 +98,12 @@ fun Route.getSheetByUserIdAndName() {
         )
         call.respond(sheets)
     }
-}
+}*/
 
 // Adiciona a ficha recebida
 fun Route.addSheet() {
     post {
-        val sheet = call.receive<Sheet>()
+        /*val sheet = call.receive<Sheet>()
         if (userStorage.find { it.userId == sheet.ownerId } == null) return@post call.respondText(
             "Usuario ${sheet.ownerId} nao existe\n",
             status = HttpStatusCode.NotFound
@@ -106,13 +114,21 @@ fun Route.addSheet() {
         }
         sheet.sheetId = if (sheetStorage.isEmpty()) 0 else maxId + 1
         sheetStorage.add(sheet)
-        call.respondText("Ficha adicionada com sucesso!\n", status = HttpStatusCode.Created)
+        call.respondText("Ficha adicionada com sucesso!\n", status = HttpStatusCode.Created)*/
+        val session = call.sessions.get<UserSession>()
+        if (session == null)
+            return@post call.respond(HttpStatusCode.Unauthorized)
+        val sheet = call.receive<Sheet>()
+        if(dao.findUserById(sheet.ownerId) == null) return@post respond(HttpStatusCode.NotFound)
+        if(session.id != sheet.ownerId) return@post respond(HttpStatusCode.Unauthorized)
+        if(dao.addNewSheet(sheet) == null) return@post respond(HttpStatusCode.InternalServerError)
+        respond(HttpStatusCode.Created)
     }
 }
 
 // Apaga a ficha especificada
 fun Route.deleteSheetById() {
-    delete("{id?}") {
+    /*delete("{id?}") {
         val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
         if (sheetStorage.find { it.sheetId == id.toInt() } == null) return@delete call.respondText(
             "Ficha $id nao existe\n",
@@ -121,12 +137,23 @@ fun Route.deleteSheetById() {
         campaignStorage.forEach { (_, _, _, sheetList): Campaign -> sheetList.removeIf { it == id.toInt() } }
         sheetStorage.removeIf { it.sheetId == id.toInt() }
         call.respondText("Ficha $id removida com sucesso\n", status = HttpStatusCode.Accepted)
+    }*/
+    delete {
+        val session = call.sessions.get<UserSession>()
+        if (session == null)
+            return@delete call.respond(HttpStatusCode.Unauthorized)
+        val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
+        val sheet = dao.findSheetById(id)
+        if(sheet == null) return@delete call.respond(HttpStatusCode.NotFound)
+        if(sheet.ownerId != session.id) return@delete call.respond(HttpStatusCode.Unauthorized)
+        if(dao.deleteSheet(id) == false) return@delete call.respond(HttpStatusCode.InternalServerError)
+        call.respond(HttpStatusCode.Accepted)
     }
 }
 
 // Atualiza a ficha especificada com as informaçoes mandadas
 fun Route.updateSheetById() {
-    post("{sheetId?}") {
+    /*post("{sheetId?}") {
         val sheetId = call.parameters["sheetId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
         val originalSheet = sheetStorage.find { it.sheetId == sheetId.toInt() }
         if (originalSheet == null) return@post call.respondText(
@@ -148,5 +175,19 @@ fun Route.updateSheetById() {
             }
         }
         call.respondText("Ficha $sheetId atualizada com sucesso!\n", status = HttpStatusCode.OK)
+    }*/
+    post {
+        val session = call.sessions.get<UserSession>()
+        if (session == null)
+            return@post call.respond(HttpStatusCode.Unauthorized)
+        val sheetId = call.parameters["sheetId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
+        val originalSheet = dao.findSheetById(sheetId)
+        if(originalSheet == null) return@post call.respond(HttpStatusCode.NotFound)
+        val updatedSheet = call.receive<Sheet>()
+        if(updatedSheet.sheetId != sheetId) return@post call.respond(HttpStatusCode.BadRequest)
+        if(updatedSheet.ownerId != originalSheet.ownerId || originalSheet.ownerId != session.id)
+            return@post call.respond(HttpStatusCode.Unauthorized)
+        if(dao.editSheet(updatedSheet) == false) return@post call.respond(HttpStatusCode.InternalServerError)
+        call.respond(HttpStatusCode.OK)
     }
 }
