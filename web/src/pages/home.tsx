@@ -118,6 +118,12 @@ function Home() {
         </div>
         {username ? logged_dropdown : not_logged_dropdown}
       </Navbar>
+      <div className={username ? "flex gap-2 bg-primary" : "hidden"} style={{flexDirection: "column", position: "absolute", top: "40%", left: "50%", transform: "translate(-50%, -50%)", borderRadius: "1rem", padding: "3rem"}}>
+          <Button className="btn btn-secondary" style={{width: "15rem"}} onClick={() => window.location.href = "/sheets/edit"}>Create Sheet</Button>
+          <Button className="btn btn-secondary" style={{width: "15rem"}}>Create Campaign</Button>
+          <Button className="btn btn-secondary" style={{width: "15rem"}} onClick={() => window.location.href = "/sheets"}>My Sheets</Button>
+          <Button className="btn btn-secondary" style={{width: "15rem"}} onClick={() => window.location.href = "/campaigns"}>My Campaigns</Button>
+      </div>
     </div>
   )
 }

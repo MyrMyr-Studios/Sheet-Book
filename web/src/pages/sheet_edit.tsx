@@ -1,6 +1,6 @@
 import axios from 'axios'
 import {useState, useEffect} from "react";
-import { Input, Textarea } from 'react-daisyui';
+import { Button, Input, Textarea } from 'react-daisyui';
 
 function SheetEdit() {
   const [sheet, setSheet] = useState({
@@ -41,6 +41,14 @@ function SheetEdit() {
     skills: "",
     savingThrows: ""
   })
+
+  const getSheet = () => {
+    axios
+      .get('/sheets')
+      .then((response) => {
+        if (response.status === 200) setSheet(response.data)
+      })
+  }
 
   return (
     <div>
@@ -83,25 +91,25 @@ function SheetEdit() {
           <label>Speed</label>
           <Input type="number" name="speed" value={sheet.speed} onChange={(e) => setSheet({...sheet, speed: Number(e.target.value)})} style={{minHeight: "3rem"}} />
           <label>Personality Traits</label>
-          <Input type="text" name="personalityTraits" value={sheet.personalityTraits} onChange={(e) => setSheet({...sheet, personalityTraits: e.target.value})} style={{minHeight: "3rem"}} />
+          <Textarea value={sheet.personalityTraits} onChange={(e) => setSheet({...sheet, personalityTraits: e.target.value})} style={{minHeight: "6rem", width: "100%"}}></Textarea>
           <label>Ideals</label>
-          <Input type="text" name="ideals" value={sheet.ideals} onChange={(e) => setSheet({...sheet, ideals: e.target.value})} style={{minHeight: "3rem"}} />
+          <Textarea value={sheet.ideals} onChange={(e) => setSheet({...sheet, ideals: e.target.value})} style={{minHeight: "6rem", width: "100%"}}></Textarea>
           <label>Bonds</label>
-          <Input type="text" name="bonds" value={sheet.bonds} onChange={(e) => setSheet({...sheet, bonds: e.target.value})} style={{minHeight: "3rem"}} />
+          <Textarea value={sheet.bonds} onChange={(e) => setSheet({...sheet, bonds: e.target.value})} style={{minHeight: "6rem", width: "100%"}}></Textarea>
           <label>Flaws</label>
-          <Input type="text" name="flaws" value={sheet.flaws} onChange={(e) => setSheet({...sheet, flaws: e.target.value})} style={{minHeight: "3rem"}} />
+          <Textarea value={sheet.flaws} onChange={(e) => setSheet({...sheet, flaws: e.target.value})} style={{minHeight: "6rem", width: "100%"}}></Textarea>
           <label>Features</label>
-          <Input type="text" name="features" value={sheet.features} onChange={(e) => setSheet({...sheet, features: e.target.value})} style={{minHeight: "5rem"}} />
+          <Textarea value={sheet.features} onChange={(e) => setSheet({...sheet, features: e.target.value})} style={{minHeight: "6rem", width: "100%"}}></Textarea>
           <label>Traits</label>
-          <Input type="text" name="traits" value={sheet.traits} onChange={(e) => setSheet({...sheet, traits: e.target.value})} style={{minHeight: "5rem"}} />
+          <Textarea value={sheet.traits} onChange={(e) => setSheet({...sheet, traits: e.target.value})} style={{minHeight: "6rem", width: "100%"}}></Textarea>
           <label>Equipment</label>
-          <Input type="text" name="equipment" value={sheet.equipment} onChange={(e) => setSheet({...sheet, equipment: e.target.value})} style={{minHeight: "5rem"}} />
+          <Textarea value={sheet.equipment} onChange={(e) => setSheet({...sheet, equipment: e.target.value})} style={{minHeight: "6rem", width: "100%"}}></Textarea>
           <label>Proficiencies</label>
-          <Input type="text" name="proficiencies" value={sheet.proficiencies} onChange={(e) => setSheet({...sheet, proficiencies: e.target.value})} style={{minHeight: "4rem"}} />
+          <Textarea value={sheet.proficiencies} onChange={(e) => setSheet({...sheet, proficiencies: e.target.value})} style={{minHeight: "6rem", width: "100%"}}></Textarea>
           <label>Perception</label>
           <Input type="text" name="perception" value={sheet.perception} onChange={(e) => setSheet({...sheet, perception: e.target.value})} style={{minHeight: "3rem"}} />
           <label>Languages</label>
-          <Input type="text" name="languages" value={sheet.languages} onChange={(e) => setSheet({...sheet, languages: e.target.value})} style={{minHeight: "3rem"}} />
+          <Textarea value={sheet.languages} onChange={(e) => setSheet({...sheet, languages: e.target.value})} style={{minHeight: "6rem", width: "100%"}}></Textarea>
           <label>HP</label>
           <Input type="number" name="hp" value={sheet.hp} onChange={(e) => setSheet({...sheet, hp: Number(e.target.value)})} style={{minHeight: "3rem"}} />
           <label>Temporary HP</label>
@@ -113,13 +121,19 @@ function SheetEdit() {
           <label>Attacks</label>
           <Textarea value={sheet.attacks} onChange={(e) => setSheet({...sheet, attacks: e.target.value})} style={{minHeight: "6rem", width: "100%"}}></Textarea>
           <label>Spellcasting</label>
-          <Input type="text" name="spellcasting" value={sheet.spellcasting} onChange={(e) => setSheet({...sheet, spellcasting: e.target.value})} style={{minHeight: "4rem"}} />
+          <Textarea value={sheet.spellcasting} onChange={(e) => setSheet({...sheet, spellcasting: e.target.value})} style={{minHeight: "6rem", width: "100%"}}></Textarea>
           <label>Skills</label>
           <Textarea value={sheet.skills} onChange={(e) => setSheet({...sheet, skills: e.target.value})} style={{minHeight: "6rem", width: "100%"}}></Textarea>
           <label>Saving Throws</label>
           <Input type="text" name="savingThrows" value={sheet.savingThrows} onChange={(e) => setSheet({...sheet, savingThrows: e.target.value})} style={{minHeight: "3rem"}} />
         </div>
-        <pre style={{width: "50vw"}}>{JSON.stringify(sheet, null, 2)}</pre>
+        <div>
+          <Button className="btn btn-accent" style={{width: "10rem", height: "3rem", margin: "1rem"}}>Save</Button>
+          <Button className="btn btn-accent" style={{width: "10rem", height: "3rem", margin: "1rem"}}>Add to Campaign</Button>
+          <Button className="btn btn-secondary" style={{width: "10rem", height: "3rem", margin: "1rem"}}>Delete</Button>
+          <Button className="btn btn-secondary" style={{width: "10rem", height: "3rem", margin: "1rem"}}>Cancel</Button>
+          <pre style={{width: "50vw", height: "90vh", overflowY: "scroll"}}>{JSON.stringify(sheet, null, 2)}</pre>
+        </div>
       </div>
     </div>
   );          
