@@ -16,13 +16,11 @@ import kotlinx.serialization.encodeToString
 
 fun Route.sheetRouting() {
     route("/sheets") {
-        listSheets()
-        getSheetById()
-        getSheetByUserId()
-        getSheetByUserIdAndName()
-        addSheet()
-        deleteSheetById()
-        updateSheetById()
+        list()
+        retrieve()
+        add()
+        delete()
+        update()
     }
 }
 
@@ -37,7 +35,7 @@ fun Route.listSheets() {
 }
 
 // Devolve a ficha com o ID especificado
-fun Route.getSheetById() {
+fun Route.retrieve() {
     /*get("{id?}") {
         val id = call.parameters["id"] ?: return@get call.respondText(
             "ID faltando\n",
@@ -49,10 +47,7 @@ fun Route.getSheetById() {
         )
         call.respond(sheet)
     }*/
-    get {
-        val session = call.sessions.get<UserSession>()
-        if (session == null)
-            return@get call.respond(HttpStatusCode.Unauthorized)
+    get("{id?}") {
         val id = URLDecoder.decode(call.parameters["id"], "UTF-8") ?: return@get call.respond(HttpStatusCode.BadRequest)
         val sheet = dao.findSheetById(id)//sheetStorage.find { it.sheetId == id.toInt() } ?:
         if(sheet == null) return@get call.respond(HttpStatusCode.NotFound)
@@ -101,7 +96,7 @@ fun Route.getSheetById() {
 }*/
 
 // Adiciona a ficha recebida
-fun Route.addSheet() {
+fun Route.add() {
     post {
         /*val sheet = call.receive<Sheet>()
         if (userStorage.find { it.userId == sheet.ownerId } == null) return@post call.respondText(
@@ -127,7 +122,7 @@ fun Route.addSheet() {
 }
 
 // Apaga a ficha especificada
-fun Route.deleteSheetById() {
+fun Route.delete() {
     /*delete("{id?}") {
         val id = call.parameters["id"] ?: return@delete call.respond(HttpStatusCode.BadRequest)
         if (sheetStorage.find { it.sheetId == id.toInt() } == null) return@delete call.respondText(
@@ -152,7 +147,7 @@ fun Route.deleteSheetById() {
 }
 
 // Atualiza a ficha especificada com as informaçoes mandadas
-fun Route.updateSheetById() {
+fun Route.update() {
     /*post("{sheetId?}") {
         val sheetId = call.parameters["sheetId"] ?: return@post call.respond(HttpStatusCode.BadRequest)
         val originalSheet = sheetStorage.find { it.sheetId == sheetId.toInt() }
@@ -176,7 +171,7 @@ fun Route.updateSheetById() {
         }
         call.respondText("Ficha $sheetId atualizada com sucesso!\n", status = HttpStatusCode.OK)
     }*/
-    post {
+    post("{sheetId?}") {
         val session = call.sessions.get<UserSession>()
         if (session == null)
             return@post call.respond(HttpStatusCode.Unauthorized)
