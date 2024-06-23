@@ -4,6 +4,9 @@ import { Button, Input, Textarea } from 'react-daisyui';
 
 function SheetEdit() {
   const [sheet, setSheet] = useState({
+    ownerId: -1,
+    sheetId: -1,
+    campaignId: null,
     name: "",
     level: 0,
     class_t: "",
@@ -43,10 +46,22 @@ function SheetEdit() {
   })
 
   const getSheet = () => {
+    // axios
+    //   .get('/sheets')
+    //   .then((response) => {
+    //     if (response.status === 200) setSheet(response.data)
+    //   })
+  }
+
+  const saveSheet = () => {
     axios
-      .get('/sheets')
+      .post('/sheets', sheet)
       .then((response) => {
-        if (response.status === 200) setSheet(response.data)
+        if (response.status === 200) alert("Sheet saved")
+        else if(response.status === 201) {
+          setSheet(response.data)
+          alert("Sheet created")
+        }
       })
   }
 
@@ -128,7 +143,7 @@ function SheetEdit() {
           <Input type="text" name="savingThrows" value={sheet.savingThrows} onChange={(e) => setSheet({...sheet, savingThrows: e.target.value})} style={{minHeight: "3rem"}} />
         </div>
         <div>
-          <Button className="btn btn-accent" style={{width: "10rem", height: "3rem", margin: "1rem"}}>Save</Button>
+          <Button className="btn btn-accent" style={{width: "10rem", height: "3rem", margin: "1rem"}} onClick={saveSheet}>Save</Button>
           <Button className="btn btn-accent" style={{width: "10rem", height: "3rem", margin: "1rem"}}>Add to Campaign</Button>
           <Button className="btn btn-secondary" style={{width: "10rem", height: "3rem", margin: "1rem"}}>Delete</Button>
           <Button className="btn btn-secondary" style={{width: "10rem", height: "3rem", margin: "1rem"}}>Cancel</Button>
