@@ -98,4 +98,26 @@ fun Route.campaignRouting() {
             call.respond(HttpStatusCode.OK)
         }
     }
+    route("/campaign/list") {
+        // Retorna lista de usuarios (nome, email) e lista de sheets
+        get("{id?}") {
+            val id = (URLDecoder.decode(call.parameters["id"], "UTF-8")).toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest)
+            val campaign = dao.findCampaignById(id)
+            if(campaign == null) return@get call.respond(HttpStatusCode.NotFound)
+            val usersInfo: MutableList<Pair<String, String>> = mutableListOf<Pair<String, String>>()
+            for(userId in campaign.userList) {
+                val user = dao.findUserById(userId)
+                if(user == null) return@get call.respond(HttpStatusCode.NotFound)
+                usersInfo.add(Pair(user.name, user.email))
+            }
+            call.respond(HttpStatusCode.OK, Json.encodeToString(usersInfo))
+            val sheets: MutableList<Sheet> = mutableListOf<Sheet>()
+            for(sheetId in campaign.sheetList) {
+                val sheet = dao.findSheetById(sheetId)
+                if(sheet == null) return@get call.respond(HttpStatusCode.NotFound)
+                sheets.add(sheet)
+            }
+            call.respond(HttpStatusCode.OK, Json.encodeToString(sheets))
+        }
+    }
 }
