@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {useState, useEffect} from "react";
+import { Button } from 'react-daisyui';
 import { Link } from 'react-router-dom';
 
 function Sheets() {
@@ -19,11 +20,13 @@ function Sheets() {
 
   return (
     <div>
-      <a href="/sheets/edit"><h1>Sheets</h1></a>
+      <a href="/sheets/view">
+        <Button color="primary" style={{margin: "1rem"}}>New</Button>
+      </a>
       <div>
         {sheetList.map((sheet) => {
           return (
-            <Link to="/sheets/edit" state={sheet} key={sheet.sheetId}>
+            <Link to="/sheets/view" state={sheet} key={sheet.sheetId}>
               <div className="bg-secondary" style={{borderRadius: "1rem", padding: "1rem", margin: "1rem"}}>
                 <span className='text-secondary-content'>{sheet.name} [ level {sheet.level} ]</span>
               </div>

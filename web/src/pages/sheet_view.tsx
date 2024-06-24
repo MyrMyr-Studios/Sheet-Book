@@ -58,11 +58,7 @@ function SheetEdit() {
     axios
       .post('/sheets', sheet)
       .then((response) => {
-        if (response.status === 200) alert("Sheet saved")
-        else if(response.status === 201) {
-          setSheet(response.data)
-          alert("Sheet created")
-        }
+        if (response.status === 200 || response.status === 201) navigate("/sheets")
       })
   }
 
@@ -70,10 +66,7 @@ function SheetEdit() {
     axios
       .get('/sheets/delete', {params: {id: sheet.sheetId}})
       .then((response) => {
-        if (response.status === 200) {
-          alert("Sheet deleted")
-          navigate("/sheets")
-        }
+        if (response.status === 200) navigate("/sheets")
       })
   }
 
@@ -158,7 +151,7 @@ function SheetEdit() {
           <Button className="btn btn-accent" style={{width: "10rem", height: "3rem", margin: "1rem"}} onClick={saveSheet}>Save</Button>
           <Button className="btn btn-accent" style={{width: "10rem", height: "3rem", margin: "1rem"}}>Add to Campaign</Button>
           <Button className="btn btn-secondary" style={{width: "10rem", height: "3rem", margin: "1rem"}} onClick={deleteSheet}>Delete</Button>
-          <Button className="btn btn-secondary" style={{width: "10rem", height: "3rem", margin: "1rem"}}>Cancel</Button>
+          <Button className="btn btn-secondary" style={{width: "10rem", height: "3rem", margin: "1rem"}} onClick={() => navigate("/sheets")}>Back</Button>
           <pre style={{width: "50vw", height: "90vh", overflowY: "scroll"}}>{JSON.stringify(sheet, null, 2)}</pre>
         </div>
       </div>
