@@ -1,6 +1,7 @@
 import axios from 'axios'
 import {useState, useEffect} from "react";
 import { Button, Input, Textarea } from 'react-daisyui';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function SheetEdit() {
   const [sheet, setSheet] = useState({
@@ -45,13 +46,13 @@ function SheetEdit() {
     savingThrows: ""
   })
 
-  const getSheet = () => {
-    // axios
-    //   .get('/sheets')
-    //   .then((response) => {
-    //     if (response.status === 200) setSheet(response.data)
-    //   })
-  }
+  const navigate = useNavigate();
+  const location = useLocation();
+  useEffect(() => {
+    if (location.state) {
+      setSheet(location.state)
+    }
+  }, [location])
 
   const saveSheet = () => {
     axios
@@ -61,6 +62,17 @@ function SheetEdit() {
         else if(response.status === 201) {
           setSheet(response.data)
           alert("Sheet created")
+        }
+      })
+  }
+
+  const deleteSheet = () => {
+    axios
+      .get('/sheets/delete', {params: {id: sheet.sheetId}})
+      .then((response) => {
+        if (response.status === 200) {
+          alert("Sheet deleted")
+          navigate("/sheets")
         }
       })
   }
@@ -145,7 +157,7 @@ function SheetEdit() {
         <div>
           <Button className="btn btn-accent" style={{width: "10rem", height: "3rem", margin: "1rem"}} onClick={saveSheet}>Save</Button>
           <Button className="btn btn-accent" style={{width: "10rem", height: "3rem", margin: "1rem"}}>Add to Campaign</Button>
-          <Button className="btn btn-secondary" style={{width: "10rem", height: "3rem", margin: "1rem"}}>Delete</Button>
+          <Button className="btn btn-secondary" style={{width: "10rem", height: "3rem", margin: "1rem"}} onClick={deleteSheet}>Delete</Button>
           <Button className="btn btn-secondary" style={{width: "10rem", height: "3rem", margin: "1rem"}}>Cancel</Button>
           <pre style={{width: "50vw", height: "90vh", overflowY: "scroll"}}>{JSON.stringify(sheet, null, 2)}</pre>
         </div>
