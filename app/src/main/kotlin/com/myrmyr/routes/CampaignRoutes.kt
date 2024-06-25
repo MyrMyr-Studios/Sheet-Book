@@ -40,6 +40,7 @@ fun Route.campaignRouting() {
             val campaignName = call.receive<Campaign>().name
             val newCampaign = dao.addNewCampaign(campaignName)
             if(newCampaign == null) return@post call.respond(HttpStatusCode.InternalServerError)
+            dao.addUserToCampaign(session.id, newCampaign.campaignId)
             return@post call.respond(HttpStatusCode.Created, Json.encodeToString(newCampaign))
         }
     }
