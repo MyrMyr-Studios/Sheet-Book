@@ -6,13 +6,16 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.serialization.Serializable
 import java.net.URLDecoder
 import io.ktor.server.sessions.*
 import com.myrmyr.UserSession
 import com.myrmyr.dao.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.Serializable
+
+@Serializable data class CampaignInfo(val users: List<Map<String, String>>, val sheets: List<Sheet>, val name: String)
+@Serializable data class UserPayload(val id: Int, val email: String)
 
 fun Route.campaignRouting() {
     route("/campaigns") {
@@ -47,12 +50,11 @@ fun Route.campaignRouting() {
 
     route("/campaign/users") {
         // Adicionar usuário a uma campanha por email
-        post("{id? , email?}") {
-            val id = (URLDecoder.decode(call.parameters["id"], "UTF-8")).toIntOrNull() ?: return@post call.respond(HttpStatusCode.BadRequest)
-            val email = (URLDecoder.decode(call.parameters["email"], "UTF-8"))
-            val user = dao.findUserByEmail(email)
+        post {
+            val payload = call.receive<UserPayload>()
+            val user = dao.findUserByEmail(payload.email)
             if(user == null) return@post call.respond(HttpStatusCode.NotFound)
-            if(dao.addUserToCampaign(user.userId, id) == false) return@post call.respond(HttpStatusCode.InternalServerError)
+            if(dao.addUserToCampaign(user.userId, payload.id) == false) return@post call.respond(HttpStatusCode.InternalServerError)
             call.respond(HttpStatusCode.OK) // WIP
         }
 
@@ -69,7 +71,7 @@ fun Route.campaignRouting() {
 
     route("/campaign/sheets") {
         // Adicionar ficha a uma campanha
-        post("{id? , sheetId?}") {
+        post {
             val id = (URLDecoder.decode(call.parameters["id"], "UTF-8")).toIntOrNull() ?: return@post call.respond(HttpStatusCode.BadRequest)
             val sheetId = (URLDecoder.decode(call.parameters["sheetId"], "UTF-8")).toIntOrNull() ?: return@post call.respond(HttpStatusCode.BadRequest)
             val sheet = dao.findSheetById(sheetId)
@@ -99,26 +101,26 @@ fun Route.campaignRouting() {
             call.respond(HttpStatusCode.OK)
         }
     }
-    route("/campaign/list") {
+    route("/campaign/info") {
         // Retorna lista de usuarios (nome, email) e lista de sheets
         get("{id?}") {
             val id = (URLDecoder.decode(call.parameters["id"], "UTF-8")).toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest)
             val campaign = dao.findCampaignById(id)
             if(campaign == null) return@get call.respond(HttpStatusCode.NotFound)
-            val usersInfo: MutableList<Pair<String, String>> = mutableListOf<Pair<String, String>>()
+            val users: MutableList<Map<String, String>> = mutableListOf<Map<String, String>>()
             for(userId in campaign.userList) {
                 val user = dao.findUserById(userId)
                 if(user == null) return@get call.respond(HttpStatusCode.NotFound)
-                usersInfo.add(Pair(user.name, user.email))
+                users.add(mapOf("name" to user.name, "email" to user.email))
             }
-            call.respond(HttpStatusCode.OK, Json.encodeToString(usersInfo))
             val sheets: MutableList<Sheet> = mutableListOf<Sheet>()
             for(sheetId in campaign.sheetList) {
                 val sheet = dao.findSheetById(sheetId)
                 if(sheet == null) return@get call.respond(HttpStatusCode.NotFound)
                 sheets.add(sheet)
             }
-            call.respond(HttpStatusCode.OK, Json.encodeToString(sheets))
+            val campaignInfo = CampaignInfo(users, sheets, campaign.name)
+            call.respond(HttpStatusCode.OK, Json.encodeToString(campaignInfo))
         }
     }
 }
