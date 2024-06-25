@@ -1,6 +1,6 @@
 import axios from 'axios'
-import {useState, useEffect} from "react";
-import { Button, Input, Textarea } from 'react-daisyui';
+import { useState, useEffect } from "react";
+import { Button, Input, Textarea, Navbar, Dropdown } from 'react-daisyui';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 function SheetEdit() {
@@ -45,35 +45,73 @@ function SheetEdit() {
     skills: "",
     savingThrows: ""
   })
-
-  const navigate = useNavigate();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [user, setUser] = useState(location.state ? location.state.user : {name: null, id: -1})
+
   useEffect(() => {
-    if (location.state) {
-      setSheet(location.state)
-    }
+    if (location.state && location.state.sheet)
+      setSheet(location.state.sheet)
   }, [location])
 
   const saveSheet = () => {
     axios
       .post('/sheets', sheet)
       .then((response) => {
-        if (response.status === 200 || response.status === 201) navigate("/sheets")
+        if (response.status === 200 || response.status === 201) navigate("/sheets", {state: {user: user}})
       })
   }
 
   const deleteSheet = () => {
+    if (sheet.sheetId === -1) return
     axios
       .get('/sheets/delete', {params: {id: sheet.sheetId}})
       .then((response) => {
-        if (response.status === 200) navigate("/sheets")
+        if (response.status === 200) navigate("/sheets", {state: {user: user}})
+      })
+  }
+
+  const loggout = () => {
+    axios
+      .get('/logout')
+      .then((response) => {
+        if (response.status === 200) {
+          setUser({name: null, id: -1})
+          navigate('/')
+        }
       })
   }
 
   return (
     <div>
+      <Navbar className='bg-primary shadow-xl justify-between' style={{padding: "1rem"}}>
+        <div className="flex-none">
+          <Button color='ghost' className="text-primary-content" style={{padding: "0", fontWeight: "700", fontSize: "1.65rem", alignContent: "center"}} onClick={() => navigate('/')}>
+            <img style={{height: "3rem", marginRight: "0.25rem"}} src="/icon.svg" />
+            Sheet Book
+          </Button>
+          <Button color='ghost' className="text-primary-content" style={{padding: "0", marginLeft: "1rem", fontWeight: "500", fontSize: "1.25rem", paddingTop: "0.2rem"}} onClick={() => navigate('/sheets', {state: {user: user}})}>Sheets</Button>
+          <Button color='ghost' className="text-primary-content" style={{padding: "0", marginLeft: "1rem", fontWeight: "500", fontSize: "1.25rem", paddingTop: "0.2rem"}} onClick={() => navigate('/campaigns', {state: {user: user}})}>Campaigns</Button>
+        </div>  
+        <div className="flex-none">
+          <span className="text-primary-content">{user.name}</span>
+          <Dropdown end>
+            <Button tag="label" tabIndex={0} color="ghost" shape="circle">
+              <span className="material-icons text-primary-content" style={{lineHeight: "1rem"}}>expand_more</span>
+            </Button>
+            <Dropdown.Menu className="mt-3 z-[1] w-52 menu-sm">
+              <Dropdown.Item onClick={() => navigate('/sheets', {state: {user: user}})}>Sheets</Dropdown.Item>
+              <Dropdown.Item onClick={() => navigate('/campaigns', {state: {user: user}})}>Campaigns</Dropdown.Item>
+              <hr style={{marginTop: ".5rem", marginBottom: ".5rem"}}/>
+              <Dropdown.Item onClick={() => navigate('/profile', {state: {user: user}})}>Profile</Dropdown.Item>
+              <Dropdown.Item>Settings</Dropdown.Item>
+              <Dropdown.Item onClick={loggout}>Logout</Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+        </div>   
+      </Navbar>
       <div className='flex gap-2' style={{width: "100%", justifyContent: "space-evenly"}}>
-        <div className='flex gap-2' style={{width: "50vw", height: "100vh", flexDirection: "column", overflowY: "scroll", padding: "1rem"}}>
+        <div className='flex gap-2' style={{width: "50vw", height: "90vh", flexDirection: "column", overflowY: "scroll", padding: "1rem"}}>
           <label>Name</label>
           <Input type="text" name="name" value={sheet.name} onChange={(e) => setSheet({...sheet, name: e.target.value})} style={{minHeight: "3rem"}} />
           <label>Level</label>
@@ -151,8 +189,8 @@ function SheetEdit() {
           <Button className="btn btn-accent" style={{width: "10rem", height: "3rem", margin: "1rem"}} onClick={saveSheet}>Save</Button>
           <Button className="btn btn-accent" style={{width: "10rem", height: "3rem", margin: "1rem"}}>Add to Campaign</Button>
           <Button className="btn btn-secondary" style={{width: "10rem", height: "3rem", margin: "1rem"}} onClick={deleteSheet}>Delete</Button>
-          <Button className="btn btn-secondary" style={{width: "10rem", height: "3rem", margin: "1rem"}} onClick={() => navigate("/sheets")}>Back</Button>
-          <pre style={{width: "50vw", height: "90vh", overflowY: "scroll"}}>{JSON.stringify(sheet, null, 2)}</pre>
+          <Button className="btn btn-secondary" style={{width: "10rem", height: "3rem", margin: "1rem"}} onClick={() => navigate("/sheets", {state: {user: user}})}>Cancel</Button>
+          <pre style={{width: "50vw", height: "80vh", overflowY: "scroll"}}>{JSON.stringify(sheet, null, 2)}</pre>
         </div>
       </div>
     </div>

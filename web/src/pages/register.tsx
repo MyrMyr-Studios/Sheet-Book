@@ -1,6 +1,6 @@
 import axios from 'axios'
-import {useState, useEffect} from "react";
-import {Input, Button} from 'react-daisyui'
+import { useState, useEffect } from "react";
+import { Input, Button, Navbar } from 'react-daisyui'
 import { themeChange } from 'theme-change';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -83,22 +83,30 @@ function Register() {
 
   return (
     <>
+    <Navbar className='bg-primary shadow-xl justify-between' style={{padding: "1rem"}}>
+      <div className="flex-none">
+        <Button color='ghost' className="text-primary-content" style={{padding: "0", fontWeight: "700", fontSize: "1.65rem", alignContent: "center"}} onClick={() => navigate('/')}>
+          <img style={{height: "3rem", marginRight: "0.25rem"}} src="/icon.svg" />
+          Sheet Book
+        </Button>
+      </div>  
+    </Navbar>
     <div className="" style={{height: "100vh", width: "100vw", position: "absolute"}}></div>
     <div className="flex gap-2" style={{flexDirection: "column", position: "absolute", top: "40%", left: "50%", transform: "translate(-50%, -50%)"}}>
-        <img style={{height: "4.5rem", width: "4.5rem", alignSelf: "center"}} src="/sheet-book-outline-blue.png" />
-        <div className="flex gap-2 bg-secondary" style={{flexDirection: "column", height: "30rem", width: "40rem", borderRadius: "1rem", padding: "3rem"}}>
-            <label className="label text-secondary-content" style={{fontWeight: "700", lineHeight: "0.1rem"}}>Username</label>
-            <Input type="text" onChange={(e) => validateUsername(e.target.value)} id='username'/>
-            <label className="label text-error" style={{fontSize: "0.75rem", lineHeight: "0.1rem"}} id='username_error'></label>
-            <label className="label text-secondary-content" style={{fontWeight: "700", lineHeight: "0.1rem"}}>Email</label>
-            <Input type="email" onChange={(e) => validateEmail(e.target.value)} id='email' />
-            <label className="label text-error" style={{fontSize: "0.75rem", lineHeight: "0.1rem"}} id='email_error'></label>
-            <label className="label text-secondary-content" style={{fontWeight: "700", lineHeight: "0.1rem"}}>Password</label>
-            <Input type="password" onChange={(e) => validatePassword(e.target.value)} id='password'/>
-            <label className="label text-error" style={{fontSize: "0.75rem", lineHeight: "0.1rem"}} id='password_error'></label>
-            <Button className="btn btn-accent" style={{width: "50%", alignSelf: "center"}} onClick={validateUserInput}>Register</Button>
-            <span className="text-secondary-content" style={{alignSelf: "center"}}>Already have an account? <Link to="/" className="text-accent">Login</Link></span>
-        </div>
+      <img style={{height: "4.5rem", width: "4.5rem", alignSelf: "center"}} src="/sheet-book-outline-blue.png" />
+      <div className="flex gap-2 bg-secondary" style={{flexDirection: "column", height: "30rem", width: "40rem", borderRadius: "1rem", padding: "3rem"}}>
+          <label className="label text-secondary-content" style={{fontWeight: "700", lineHeight: "0.1rem"}}>Username</label>
+          <Input type="text" onChange={(e) => validateUsername(e.target.value)} id='username'/>
+          <label className="label text-error" style={{fontSize: "0.75rem", lineHeight: "0.1rem"}} id='username_error'></label>
+          <label className="label text-secondary-content" style={{fontWeight: "700", lineHeight: "0.1rem"}}>Email</label>
+          <Input type="email" onChange={(e) => validateEmail(e.target.value)} id='email' />
+          <label className="label text-error" style={{fontSize: "0.75rem", lineHeight: "0.1rem"}} id='email_error'></label>
+          <label className="label text-secondary-content" style={{fontWeight: "700", lineHeight: "0.1rem"}}>Password</label>
+          <Input type="password" onChange={(e) => validatePassword(e.target.value)} id='password'/>
+          <label className="label text-error" style={{fontSize: "0.75rem", lineHeight: "0.1rem"}} id='password_error'></label>
+          <Button className="btn btn-accent" style={{width: "50%", alignSelf: "center"}} onClick={validateUserInput}>Register</Button>
+          <span className="text-secondary-content" style={{alignSelf: "center"}}>Already have an account? <Link to="/" className="text-accent">Login</Link></span>
+      </div>
     </div>
     </>
   )
