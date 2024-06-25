@@ -7,16 +7,35 @@ function CampaignView() {
   const location = useLocation();
   const navigate = useNavigate();
   const [user, setUser] = useState(location.state ? location.state.user : {name: null, id: -1})
-  const [campaign, setCampaign] = useState({campaignId: -1, name: null, userList: [], sheetList: []})
+  const [email, setEmail] = useState<string | null>(null)
+  const [campaignName, setCampaignName] = useState<string | null>(null)
+  const [campaignId, setCampaignId] = useState<number>(-1)
+  const [userList, setUserList] = useState<any[]>([])
+  const [sheetList, setSheetList] = useState<any[]>([])
 
   useEffect(() => {
-    if (location.state && location.state.campaign)
-      setCampaign(location.state.campaign)
+    if (location.state && location.state.campaign) {
+      setCampaignName(location.state.campaign.name)
+      setCampaignId(location.state.campaign.campaignId)
+      getCampaignInfo(location.state.campaign.campaignId)
+    }
   }, [location])
+
+  const getCampaignInfo = (id: number) => {
+    axios
+      .get('/campaign/info', {params: {id: id}})
+      .then((response) => {
+        if (response.status === 200) {
+          setCampaignName(response.data.name)
+          setUserList(response.data.users)
+          setSheetList(response.data.sheets)
+        }
+      })
+  }
 
   const createCampaign = () => {
     axios
-      .post('/campaigns', campaign)
+      .post('/campaigns', {name: campaignName, campaignId: campaignId, userList: userList, sheetList: sheetList})
       .then((response) => {
         if (response.status === 201)
           navigate('/campaigns', {state: {user: user}})
@@ -34,10 +53,10 @@ function CampaignView() {
       })
   }
 
-  const validateCampaignName = (campaignName: string) => {
+  const validateCampaignName = (name: string) => {
     const campaignNameInput = document.getElementById("campaignName")
     const campaignName_error = document.getElementById("campaignName_error")
-    if(campaignName === "") {
+    if(name === "") {
       campaignNameInput?.classList.add("input-error")
       if(campaignName_error) campaignName_error.innerText = "Campaign name cannot be empty"
     }
@@ -45,8 +64,59 @@ function CampaignView() {
       campaignNameInput?.classList.remove("input-error")
       if(campaignName_error) campaignName_error.innerText = ""
     }
-    setCampaign({...campaign, name: campaignName})
+    setCampaignName(name)
   }
+
+  const validateEmail = (email: string) => {
+    const emailInput = document.getElementById("email")
+    const email_error = document.getElementById("email_error")
+    if(email === "") {
+      emailInput?.classList.add("input-error")
+      if(email_error) email_error.innerText = "Email cannot be empty"
+    }
+    else {
+      emailInput?.classList.remove("input-error")
+      if(email_error) email_error.innerText = ""
+    }
+    setEmail(email)
+  }
+
+  const deleteCampaign = () => {
+    axios
+      .get('/campaign/delete', {params: {id: campaignId}})
+      .then((response) => {
+        if (response.status === 200) {
+          navigate('/campaigns', {state: {user: user}})
+        }
+      })
+  }
+
+  const addUser = () => {
+    axios
+      .post('/campaign/users', {id: campaignId, email: email})
+      .then((response) => {
+        if (response.status === 200) {
+          getCampaignInfo(campaignId)
+        }
+      }).catch((error) => {
+        if(error.response.status === 404) {
+          const emailInput = document.getElementById("email")
+          emailInput?.classList.add("input-error")
+          const email_error = document.getElementById("email_error")
+          if(email_error) email_error.innerText = "User does not exist"
+        }
+      })
+  }
+
+  const removeUser = (email: string) => {
+    axios
+      .get('/campaign/users', {params: {id: campaignId, email: email}})
+      .then((response) => {
+        if (response.status === 200) {
+          getCampaignInfo(campaignId)
+        }
+      })
+    }
 
   const newCampaign = (
     <div className="flex gap-2" style={{flexDirection: "column", position: "absolute", top: "40%", left: "50%", transform: "translate(-50%, -50%)"}}>
@@ -63,7 +133,34 @@ function CampaignView() {
 
   const campaignView = (
     <div>
-      <span className="text-2xl font-bold ml-4 mt-4">Campaign: {campaign.name}</span>
+      <span className="text-2xl font-bold" style={{margin: "1rem"}}>Campaign: {campaignName}</span>
+      <br />
+      <Input type="email" id="email" placeholder="Email" style={{width: "20rem", marginLeft: "1rem"}} onChange={(e) => validateEmail(e.target.value)} />
+      <label className="label text-error" style={{fontSize: "0.75rem", lineHeight: "0.1rem", marginLeft: "1rem"}} id='email_error'></label>
+      
+      <Button color="primary" style={{margin: "1rem"}} onClick={addUser}>Add User</Button>
+      <Button color="primary" style={{margin: "1rem"}} onClick={() => navigate('/sheets/view', {state: {user: user, campaignId: campaignId}})}>Add Sheet</Button>
+      <Button color="primary" style={{margin: "1rem"}} onClick={deleteCampaign}>Delete Campaign</Button>
+
+      {userList.map((user) => {
+        return (
+          <div key={user.email} className="bg-secondary flex" style={{borderRadius: "1rem", padding: "1rem", margin: "1rem", justifyContent: "space-between", alignItems: "center"}}>
+            <span className="text-lg font-bold text-secondary-content">{user.name}</span>
+            <Button tag="label" tabIndex={0} color="ghost" shape="circle" onClick={() => removeUser(user.email)}>
+              <span className="material-icons text-primary-content" style={{lineHeight: "1rem"}}>person_remove</span>
+            </Button>
+          </div>
+        );
+      })}
+      {sheetList.map((sheet) => {
+        return (
+          <Link to="/sheets/view" state={{user: user, sheet: sheet}} key={sheet.sheetId}>
+            <div className="bg-accent" style={{borderRadius: "1rem", padding: "1rem", margin: "1rem"}}>
+              <span className="text-lg font-bold text-accent-content">{sheet.name}</span>
+            </div>
+          </Link>
+        );
+      })}
     </div>
   )
 
@@ -96,7 +193,7 @@ function CampaignView() {
         </div>   
       </Navbar>
 
-      {campaign.campaignId === -1 ? newCampaign : campaignView}
+      {campaignId === -1 ? newCampaign : campaignView}
 
     </div>
   );          
