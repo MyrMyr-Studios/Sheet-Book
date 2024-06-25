@@ -48,11 +48,43 @@ function SheetEdit() {
   const location = useLocation();
   const navigate = useNavigate();
   const [user, setUser] = useState(location.state ? location.state.user : {name: null, id: -1})
+  const [campaignList, setCampaignList] = useState<any[]>([]);
+  const [campaignName, setCampaignName] = useState<string | null>(null)
 
   useEffect(() => {
-    if (location.state && location.state.sheet)
-      setSheet(location.state.sheet)
+    if (location.state) {
+      if (location.state.sheet) {
+        setSheet(location.state.sheet)
+        getCampaignName(location.state.sheet.campaignId)
+      }
+      else if (location.state.campaignId)
+        setCampaign(location.state.campaignId)
+      getCampaignList();
+    }
   }, [location])
+
+  const getCampaignList = () => {
+    axios
+      .get('/campaigns')
+      .then((response) => {
+        if (response.status === 200) setCampaignList(response.data)
+      })
+  }
+
+  const setCampaign = (id: any) => {
+    setSheet({...sheet, campaignId: id})
+    getCampaignName(id)
+  }
+
+  const getCampaignName = (id: any) => {
+    if (id === null || id === -1) return
+    axios
+      .get('/campaign/info', {params: {id: id}})
+      .then((response) => {
+        if (response.status === 200)
+          setCampaignName(response.data.name)
+      })
+  }
 
   const saveSheet = () => {
     axios
@@ -187,7 +219,16 @@ function SheetEdit() {
         </div>
         <div>
           <Button className="btn btn-accent" style={{width: "10rem", height: "3rem", margin: "1rem"}} onClick={saveSheet}>Save</Button>
-          <Button className="btn btn-accent" style={{width: "10rem", height: "3rem", margin: "1rem"}}>Add to Campaign</Button>
+          <Dropdown>
+            <Button className="btn btn-accent" style={{width: "10rem", height: "3rem", margin: "1rem", marginBottom: "0"}}>{campaignName ? campaignName : "Sem campanha"}</Button>
+            <Dropdown.Menu className="z-[1] menu-sm" style={{width: "10rem"}}>
+              {campaignList.map((campaign) => {
+                return (
+                  <Dropdown.Item key={campaign.campaignId} onClick={() => setCampaign(campaign.campaignId)}>{campaign.name}</Dropdown.Item>
+                );
+              })}
+            </Dropdown.Menu>
+          </Dropdown>
           <Button className="btn btn-secondary" style={{width: "10rem", height: "3rem", margin: "1rem"}} onClick={deleteSheet}>Delete</Button>
           <Button className="btn btn-secondary" style={{width: "10rem", height: "3rem", margin: "1rem"}} onClick={() => navigate("/sheets", {state: {user: user}})}>Cancel</Button>
           <pre style={{width: "50vw", height: "80vh", overflowY: "scroll"}}>{JSON.stringify(sheet, null, 2)}</pre>
