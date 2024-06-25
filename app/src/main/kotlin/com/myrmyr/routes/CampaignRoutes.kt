@@ -54,7 +54,10 @@ fun Route.campaignRouting() {
             val payload = call.receive<UserPayload>()
             val user = dao.findUserByEmail(payload.email)
             if(user == null) return@post call.respond(HttpStatusCode.NotFound)
-            if(dao.addUserToCampaign(user.userId, payload.id) == false) return@post call.respond(HttpStatusCode.InternalServerError)
+            val campaign = dao.findCampaignById(payload.id)
+            if(campaign == null) return@post call.respond(HttpStatusCode.NotFound)
+            if(user.userId in campaign.userList) return@post call.respond(HttpStatusCode.NotModified)
+            if(dao.addUserToCampaign(user.userId, campaign.campaignId) == false) return@post call.respond(HttpStatusCode.InternalServerError)
             call.respond(HttpStatusCode.OK) // WIP
         }
 
