@@ -37,7 +37,7 @@ fun Route.campaignRouting() {
         post {
             val session = call.sessions.get<UserSession>()
             if (session == null) return@post call.respond(HttpStatusCode.Unauthorized)
-            val campaignName = call.receive<String>()
+            val campaignName = call.receive<Campaign>().name
             val newCampaign = dao.addNewCampaign(campaignName)
             if(newCampaign == null) return@post call.respond(HttpStatusCode.InternalServerError)
             return@post call.respond(HttpStatusCode.Created, Json.encodeToString(newCampaign))
