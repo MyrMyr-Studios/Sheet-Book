@@ -33,5 +33,5 @@ interface DAOFacade {
     suspend fun addUserToCampaign(userId: Int, campaignId: Int): Boolean
     suspend fun removeUserFromCampaign(userId: Int, campaignId: Int): Boolean
     suspend fun getCampaignUsers(campaignId: Int): MutableList<Int>
-    suspend fun getUserCampaigns(userId: Int): MutableList<Int>
+    suspend fun getUserCampaigns(userId: Int): MutableList<Campaign>
 }

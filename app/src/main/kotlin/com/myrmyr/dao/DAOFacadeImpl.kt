@@ -298,10 +298,11 @@ class DAOFacadeImpl : DAOFacade {
             .toMutableList()
     }
 
-    override suspend fun getUserCampaigns(userId: Int): MutableList<Int> = dbQuery {
+    override suspend fun getUserCampaigns(userId: Int): MutableList<Campaign> = dbQuery {
         RelationUserCampaign
             .select { RelationUserCampaign.userId eq userId }
-            .map { resultRow: ResultRow -> resultRow[RelationUserCampaign.userId] }
+            .map { resultRow: ResultRow -> resultRow[RelationUserCampaign.campaignId] }
+            .map { campaignId: Int -> Campaigns.select { Campaigns.campaignId eq campaignId }.map(::resultRowToCampaign).single() }
             .toMutableList()
     }
 }
