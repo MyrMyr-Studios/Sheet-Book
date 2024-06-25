@@ -66,7 +66,7 @@ function Campaigns() {
       <div>
         {campaignList.map((campaign) => {
           return (
-            <Link to="/campaing/view" state={{user : user, campaign : campaign}} key={campaign.campaignId}>
+            <Link to="/campaigns/view" state={{user : user, campaign : campaign}} key={campaign.campaignId}>
               <div className="bg-accent" style={{borderRadius: "1rem", padding: "1rem", margin: "1rem"}}>
                 <span className='text-accent-content'>{campaign.name}</span>
               </div>
