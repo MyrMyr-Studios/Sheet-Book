@@ -12,17 +12,19 @@ import com.myrmyr.UserSession
 import com.myrmyr.dao.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.Serializable
 
+@Serializable data class UserResponse(val name: String, val id: Int)
 
 fun Route.userRouting() {
     route("/user") {
-        // Retornar nome do usuário
+        // Retornar o usuário logado
         get {
             val session = call.sessions.get<UserSession>()
             if (session == null) return@get call.respond(HttpStatusCode.BadRequest)
         
             val user = dao.findUserById(session.id)
-            call.respond(HttpStatusCode.OK, Json.encodeToString(user!!.name))
+            call.respond(HttpStatusCode.OK, Json.encodeToString(UserResponse(user!!.name, user.userId)))
         }
     }
 
@@ -36,7 +38,7 @@ fun Route.userRouting() {
         
             if (user!!.password == password) {
                 call.sessions.set(UserSession(id = user.userId))
-                call.respond(HttpStatusCode.OK)
+                call.respond(HttpStatusCode.OK, Json.encodeToString(UserResponse(user.name, user.userId)))
             } else call.respond(HttpStatusCode.Unauthorized)
         }
         
