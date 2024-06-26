@@ -114,7 +114,7 @@ fun Route.campaignRouting() {
             for(userId in campaign.userList) {
                 val user = dao.findUserById(userId)
                 if(user == null) return@get call.respond(HttpStatusCode.NotFound)
-                users.add(mapOf("name" to user.name, "email" to user.email))
+                users.add(mapOf("name" to user.name, "email" to user.email, "id" to user.userId.toString()))
             }
             val sheets: MutableList<Sheet> = mutableListOf<Sheet>()
             for(sheetId in campaign.sheetList) {
