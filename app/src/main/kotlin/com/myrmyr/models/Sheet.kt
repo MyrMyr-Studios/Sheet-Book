@@ -2,6 +2,7 @@ package com.myrmyr.models
 
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
+import com.myrmyr.models.*
 
 @Serializable
 data class Sheet (
@@ -49,9 +50,9 @@ data class Sheet (
 val sheetStorage = mutableListOf<Sheet>()
 
 object Sheets: Table() {
-    val ownerId = reference("ownerId", Users.userId)
+    val ownerId = reference("ownerId", Users.userId, onDelete = ReferenceOption.CASCADE)
     val sheetId = integer("sheetId").autoIncrement()
-    val campaignId = reference("campaignId", Campaigns.campaignId).nullable()
+    val campaignId = reference("campaignId", Campaigns.campaignId, onDelete = ReferenceOption.CASCADE).nullable()
     val name = varchar("name", 64)
     val level = integer("level")
     val class_t = varchar("class", 48)
