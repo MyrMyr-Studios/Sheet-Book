@@ -248,7 +248,7 @@ class DAOFacadeImpl : DAOFacade {
     }
 
     override suspend fun deleteCampaign(campaignId: Int): Boolean = dbQuery {
-        (Campaigns.deleteWhere { Campaigns.campaignId eq campaignId } > 0) and (RelationUserCampaign.deleteWhere { RelationUserCampaign.campaignId eq campaignId } > 0)
+        Campaigns.deleteWhere { Campaigns.campaignId eq campaignId } > 0
     }
 
     override suspend fun findCampaignById(campaignId: Int): Campaign? = dbQuery {

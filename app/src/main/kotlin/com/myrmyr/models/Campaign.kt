@@ -2,6 +2,7 @@ package com.myrmyr.models
 
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
+import com.myrmyr.models.*
 
 @Serializable
 data class Campaign (
@@ -21,6 +22,6 @@ object Campaigns : Table() {
 }
 
 object RelationUserCampaign : Table() {
-    val userId = reference("userId", Users.userId)
-    val campaignId = reference("campaignId", Campaigns.campaignId)
+    val userId = integer("userId").references(Users.userId, onDelete = ReferenceOption.CASCADE)//reference("userId", Users.userId, OnDelete = ReferenceOptions.CASCADE)
+    val campaignId = integer("campaignId").references(Campaigns.campaignId, onDelete = ReferenceOption.CASCADE)//reference("campaignId", Campaigns.campaignId)
 }
