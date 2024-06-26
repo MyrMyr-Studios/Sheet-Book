@@ -108,15 +108,20 @@ function CampaignView() {
       })
   }
 
-  const removeUser = (email: string) => {
-    axios
-      .get('/campaign/users', {params: {id: campaignId, email: email}})
-      .then((response) => {
-        if (response.status === 200) {
-          getCampaignInfo(campaignId)
-        }
-      })
+  const removeUser = (userId: number, email: string) => {
+    if (userList.length === 1)
+      deleteCampaign()
+    else {
+      axios
+        .get('/campaign/users', {params: {id: campaignId, email: email}})
+        .then((response) => {
+          if (response.status === 200) {
+            getCampaignInfo(campaignId)
+          }
+        })
+      if(userId === user.id) navigate('/campaigns', {state: {user: user}})
     }
+  }
 
   const newCampaign = (
     <div className="flex gap-2" style={{flexDirection: "column", position: "absolute", top: "40%", left: "50%", transform: "translate(-50%, -50%)"}}>
@@ -146,7 +151,7 @@ function CampaignView() {
         return (
           <div key={user.email} className="bg-secondary flex" style={{borderRadius: "1rem", padding: "1rem", margin: "1rem", justifyContent: "space-between", alignItems: "center"}}>
             <span className="text-lg font-bold text-secondary-content">{user.name}</span>
-            <Button tag="label" tabIndex={0} color="ghost" shape="circle" onClick={() => removeUser(user.email)}>
+            <Button tag="label" tabIndex={0} color="ghost" shape="circle" onClick={() => removeUser(Number(user.id), user.email)}>
               <span className="material-icons text-primary-content" style={{lineHeight: "1rem"}}>person_remove</span>
             </Button>
           </div>
