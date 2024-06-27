@@ -69,15 +69,8 @@ function CampaignView() {
 
   const validateEmail = (email: string) => {
     const emailInput = document.getElementById("email")
-    const email_error = document.getElementById("email_error")
-    if(email === "") {
-      emailInput?.classList.add("input-error")
-      if(email_error) email_error.innerText = "Email cannot be empty"
-    }
-    else {
-      emailInput?.classList.remove("input-error")
-      if(email_error) email_error.innerText = ""
-    }
+    if(email === "") emailInput?.classList.add("input-error")
+    else emailInput?.classList.remove("input-error")
     setEmail(email)
   }
 
@@ -97,13 +90,13 @@ function CampaignView() {
       .then((response) => {
         if (response.status === 200) {
           getCampaignInfo(campaignId)
+          const emailInput = document.getElementById("email")
+          emailInput?.classList.remove("input-error")
         }
       }).catch((error) => {
-        if(error.response.status === 404) {
+        if(error.response.status === 404 || error.response.status === 304) {
           const emailInput = document.getElementById("email")
           emailInput?.classList.add("input-error")
-          const email_error = document.getElementById("email_error")
-          if(email_error) email_error.innerText = "User does not exist"
         }
       })
   }
@@ -126,53 +119,59 @@ function CampaignView() {
   const newCampaign = (
     <div className="flex gap-2" style={{flexDirection: "column", position: "absolute", top: "40%", left: "50%", transform: "translate(-50%, -50%)"}}>
       <img style={{height: "4.5rem", width: "4.5rem", alignSelf: "center"}} src="/sheet-book-outline-blue.png" />
-      <div className="flex gap-2 bg-secondary" style={{flexDirection: "column", height: "20rem", width: "40rem", borderRadius: "1rem", padding: "3rem"}}>
-          <label className="label text-secondary-content" style={{fontWeight: "700", lineHeight: "0.1rem"}}>Campaign Name</label>
+      <div className="flex gap-2 bg-neutral" style={{flexDirection: "column", height: "20rem", width: "40rem", borderRadius: "1rem", padding: "3rem"}}>
+          <label className="label text-neutral-content" style={{fontWeight: "700", lineHeight: "0.1rem"}}>Campaign Name</label>
           <Input type="text" onChange={(e) => validateCampaignName(e.target.value)} id='campaignName'/>
           <label className="label text-error" style={{fontSize: "0.75rem", lineHeight: "0.1rem"}} id='campaignName_error'></label>
-          <Button className="btn btn-accent" style={{width: "50%", alignSelf: "center"}} onClick={createCampaign}>Create</Button>
+          <Button className="btn btn-primary" style={{width: "50%", alignSelf: "center"}} onClick={createCampaign}>Create</Button>
           <Button className="btn btn-secondary" style={{width: "50%", alignSelf: "center"}} onClick={() => navigate('/campaigns', {state: {user: user}})}>Cancel</Button>
       </div>
     </div>
   )
 
   const campaignView = (
-    <div>
-      <span className="text-2xl font-bold" style={{margin: "1rem"}}>Campaign: {campaignName}</span>
+    <div style={{paddingTop: "1rem"}}>
+      <span className="text-2xl font-bold" style={{margin: "1rem", fontSize: "3rem", fontWeight: "bolder"}}>{campaignName}</span>
       <br />
-      <Input type="email" id="email" placeholder="Email" style={{width: "20rem", marginLeft: "1rem"}} onChange={(e) => validateEmail(e.target.value)} />
-      <label className="label text-error" style={{fontSize: "0.75rem", lineHeight: "0.1rem", marginLeft: "1rem"}} id='email_error'></label>
       
-      <Button color="primary" style={{margin: "1rem"}} onClick={addUser}>Add User</Button>
-      <Button color="primary" style={{margin: "1rem"}} onClick={() => navigate('/sheets/view', {state: {user: user, campaignId: campaignId}})}>Add Sheet</Button>
       <Button color="primary" style={{margin: "1rem"}} onClick={deleteCampaign}>Delete Campaign</Button>
-
-      {userList.map((user) => {
-        return (
-          <div key={user.email} className="bg-secondary flex" style={{borderRadius: "1rem", padding: "1rem", margin: "1rem", justifyContent: "space-between", alignItems: "center"}}>
-            <span className="text-lg font-bold text-secondary-content">{user.name}</span>
-            <Button tag="label" tabIndex={0} color="ghost" shape="circle" onClick={() => removeUser(Number(user.id), user.email)}>
-              <span className="material-icons text-primary-content" style={{lineHeight: "1rem"}}>person_remove</span>
-            </Button>
-          </div>
-        );
-      })}
-      {sheetList.map((sheet) => {
-        return (
-          <Link to="/sheets/view" state={{user: user, sheet: sheet}} key={sheet.sheetId}>
-            <div className="bg-accent" style={{borderRadius: "1rem", padding: "1rem", margin: "1rem"}}>
-              <span className="text-lg font-bold text-accent-content">{sheet.name}</span>
+      <div className="flex gap-2 bg-neutral" style={{flexDirection: "column", margin: "1rem", borderRadius: "1rem"}}>
+        <span className="font-bold text-neutral-content" style={{padding: "1rem", fontSize: "1.5rem", paddingBottom: "0", fontWeight: "bolder"}}>Users</span>
+        <div className="flex" style={{flexDirection: "row", alignItems: "center"}}>
+          <Input type="email" id="email" placeholder="Email" style={{width: "20rem", marginLeft: "1rem"}} onChange={(e) => validateEmail(e.target.value)} />
+          <Button color="secondary" style={{margin: "1rem"}} onClick={addUser}>Add User</Button>
+        </div>
+        {userList.map((user) => {
+          return (
+            <div key={user.email} className="bg-secondary flex" style={{borderRadius: "1rem", padding: "1rem", margin: "1rem", justifyContent: "space-between", alignItems: "center", marginTop: "0"}}>
+              <span className="text-lg font-bold text-secondary-content" style={{fontWeight: "bold"}}>{user.name}</span>
+              <Button tag="label" tabIndex={0} color="ghost" shape="circle" onClick={() => removeUser(Number(user.id), user.email)}>
+                <span className="material-icons text-secondary-content" style={{lineHeight: "1rem"}}>person_remove</span>
+              </Button>
             </div>
-          </Link>
-        );
-      })}
+          );
+        })}
+      </div>
+      <div className="flex gap-2 bg-secondary" style={{flexDirection: "column", margin: "1rem", borderRadius: "1rem"}}>
+      <span className="font-bold text-secondary-content" style={{padding: "1rem", fontSize: "1.5rem", paddingBottom: "0", fontWeight: "bolder"}}>Sheets</span>
+        <Button color="neutral" style={{margin: "1rem", width: "10rem"}} onClick={() => navigate('/sheets/view', {state: {user: user, campaignId: campaignId}})}>Add Sheet</Button>
+        {sheetList.map((sheet) => {
+          return (
+            <Link to="/sheets/view" state={{user: user, sheet: sheet}} key={sheet.sheetId}>
+              <div className="bg-neutral" style={{borderRadius: "1rem", padding: "1rem", margin: "1rem"}}>
+                <span className="text-lg font-bold text-neutral-content" style={{fontWeight: "bold"}}>{sheet.name}</span>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
     </div>
   )
 
   return (
     <div>
       <Navbar className='bg-primary shadow-xl justify-between' style={{padding: "1rem"}}>
-        <div className="flex-none">
+        <div className="flex-none gap-2">
           <Button color='ghost' className="text-primary-content" style={{padding: "0", fontWeight: "700", fontSize: "1.65rem", alignContent: "center"}} onClick={() => navigate('/')}>
             <img style={{height: "3rem", marginRight: "0.25rem"}} src="/icon.svg" />
             Sheet Book
