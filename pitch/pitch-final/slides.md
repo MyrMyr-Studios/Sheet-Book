@@ -24,7 +24,7 @@ style: |
 math: mathjax
 ---
 
-# <!---fit---> Sheet Book :books:
+# <!---fit---> Sheet Book ![w:65 h:65](sheet-book-outline-blue.png)
 ## Projeto de MAC0350
 Diogo Ribeiro <span style="color:grey">n° 12717033</span>
 Luiz Fernando <span style="color:grey">n° 13671678</span>
@@ -34,9 +34,8 @@ Luiz Fernando <span style="color:grey">n° 13671678</span>
 # Desenvolvimento (emoji aqui)
 ## Primeiros Ciclos 
 
-Maior foco no back end, principalmente na implementação do banco de dados
+Maior foco no back end, principalmente na implementação do banco de dados.
 - Implementado usando Exposed e H2
-  (colocar imagens do exposed e h2)
 
 ---
 ## Ciclos Mais Recentes
@@ -45,6 +44,51 @@ Foco no front end, implementando mais funcionalidades e deixando o site mais bon
 
 ---
 
-# Demonstração
-(Colocar o icone do site aqui pra ficar bonitinho)
+# Página Inicial (não logado)
+![w:1000](./1_home_page_sign_out.png)
+
 ---
+
+# Menu de Login
+![w:1000](./2_home_page_login.png)
+
+---
+
+# Página de Cadastro
+![w:1000](./3_register_page.png)
+
+---
+
+# Página Inicial (logado)
+
+![w:1000](./4_home_page_sign_in.png)
+
+---
+
+# Ficha de D&D 5
+![w:900](./5_dnd5_sheet.png)
+
+---
+
+# Página de Criação de Ficha
+![w:1000](./6_create_sheet_page.png)
+
+---
+
+# Página de Fichas
+![w:1000](./7_my_sheets_page.png)
+
+---
+
+# Página de Criar Campanha
+![w:1000](./8_create_campaign_page.png)
+
+---
+
+# Página de Campanhas
+![w:1000](./9_my_campaigns_page.png)
+
+---
+
+# Página de Gerenciar Campanha
+![w:1000](./10_view_campaign_page.png)
