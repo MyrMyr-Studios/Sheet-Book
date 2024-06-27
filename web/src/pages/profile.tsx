@@ -22,7 +22,7 @@ function Profile() {
   return (
     <div>
       <Navbar className='bg-primary shadow-xl justify-between' style={{padding: "1rem"}}>
-        <div className="flex-none">
+        <div className="flex-none gap-2">
           <Button color='ghost' className="text-primary-content" style={{padding: "0", fontWeight: "700", fontSize: "1.65rem", alignContent: "center"}} onClick={() => navigate('/')}>
             <img style={{height: "3rem", marginRight: "0.25rem"}} src="/icon.svg" />
             Sheet Book
@@ -47,7 +47,6 @@ function Profile() {
           </Dropdown>
         </div>   
       </Navbar>
-      <h1>Profile</h1>
     </div>
   );
 }
