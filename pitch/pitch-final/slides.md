@@ -30,39 +30,49 @@ Diogo Ribeiro <span style="color:grey">n° 12717033</span>
 Luiz Fernando <span style="color:grey">n° 13671678</span>
 
 ---
-# Planejamento
 
-<div class=columns2>
-    <section>
-        <h2>Plano inicial</h2>
-        <ul>
-            <li>Criação e edição de fichas de personagens</li>
-            <li>Gerenciamento de campanhas e seus participantes</li>
-            <li>Interface de interação entre mestre e jogadores</li>
-            <li>Simulação de dados do jogo</li>
-        </ul>
-    </section>
-    <section>
-        <h2>O que foi feito</h2>
-        <ul>
-            <li>Criação e edição de fichas de personagens</li>
-            <li>Gerenciamento de campanhas e seus participantes</li>
-        </ul>
-    </section>
-</div>
+# Visão Inicial do Projeto :mag_right:
+- <span style="color:#ffcc4d">Criação</span> e <span style="color:#ffcc4d">edição</span> de fichas de personagens;
+- <span style="color:#ffcc4d">Gerenciamento</span> de campanhas e seus participantes;
+- Interface para a <span style="color:#ffcc4d">interação</span> entre jogadores e mestres;
+- <span style="color:#ffcc4d">Simulação</span> de dados de jogo;
+- <span style="color:#ffcc4d">Compartilhamento</span> de fichas.
 
 ---
 
-# Desenvolvimento (emoji aqui)
-## Primeiros Ciclos 
+# Primeiros Ciclos ![w:70](./exposed.png) ![w:70](./ktor.png) ![w:70](./h2.svg)
 
-Maior foco no back end, principalmente na implementação do banco de dados.
-- Implementado usando Exposed e H2
+Planejamento inicial das classes e funcionalidades do projeto.
+Maior foco no <span style="color:#ffcc4d">back-end</span> com <span style="color:#55acee">**Ktor**</span>, principalmente na implementação do banco de dados, utilizando <span style="color:#55acee">**Exposed**</span> e <span style="color:#55acee">**H2**</span>.
+Desenvolvimento dos <span style="color:#ffcc4d">testes automatizados</span> iniciais para o back-end.
+
+## Dificuldades :warning:
+- Aprendizado de <span style="color:#55acee">**Kotlin**</span>, do <span style="color:#55acee">**Ktor**</span> e <span style="color:#55acee">**Exposed**</span>;
+- <span style="color:#ff005e">Documentação  escassa</span> do **Exposed**;
+- <span style="color:#ff005e">Falta de guias</span> para o desenvolvimento de testes com banco de dados **H2**.
 
 ---
-## Ciclos Mais Recentes
-Foco no front end, implementando mais funcionalidades e deixando o site mais bonito
-- Implementado usando Vit e React (colocar imagem de vit e react)
+# Ciclos Mais Recentes ![w:70](./react.png) ![w:70](./vite.svg)
+
+Planejamento das páginas e funcionalidades do site.
+Foco no <span style="color:#ffcc4d">front-end</span>, implementando mais funcionalidades, trabalhando na integração e melhorando o visual do site (implementado usando <span style="color:#55acee">**Vit**</span> e <span style="color:#55acee">**React**</span>).
+Desenvolvimento de mais <span style="color:#ffcc4d">testes automatizados</span> para as novas funcionalidades.
+
+## Dificuldades :warning:
+- Aprendizado de tecnologias para o front-end;
+- Integração entre <span style="color:#55acee">**Ktor**</span> e o <span style="color:#55acee">**React**</span>;
+- Problemas com <span style="color:#ff005e">autenticação</span> do CORS;
+- Planejamento das <span style="color:#ff005e">rotas</span> no servidor.
+
+---
+
+# Docker Conteiners ![w:70](./docker.png)
+Encapsulamento dos servidores do back e front-end em <span style="color:#55acee">containers</span> <span style="color:#55acee">**Docker**</span>.
+Facilita a <span style="color:#ffcc4d">execução</span> e <span style="color:#ffcc4d">distribuição</span> do projeto.
+
+## Dificuldades :warning:
+- Configuração dos <span style="color:#55acee">containers</span> para a <span style="color:#ffcc4d">comunicação</span> entre os servidores;
+- Execução do <span style="color:#55acee">**Gradle**</span> no container do <span style="color:#55acee">**Ktor**</span>.
 
 ---
 
@@ -114,3 +124,12 @@ Foco no front end, implementando mais funcionalidades e deixando o site mais bon
 
 # Página de Gerenciar Campanha
 ![w:1000](./10_view_campaign_page.png)
+
+---
+
+# Próximos Passos :rocket:
+
+- Implementar a interface de <span style="color:#ffcc4d">interação</span> entre mestre e jogadores;
+- Implementar a <span style="color:#ffcc4d">simulação</span> de dados do jogo;
+- Implementar o <span style="color:#ffcc4d">compartilhamento</span> de fichas;
+- Melhorar o <span style="color:#ffcc4d">aspecto visual</span> do site.
