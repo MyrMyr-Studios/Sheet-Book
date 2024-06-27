@@ -91,9 +91,9 @@ function Register() {
         </Button>
       </div>  
     </Navbar>
-    <div className="" style={{height: "100vh", width: "100vw", position: "absolute"}}></div>
+    <div className="" style={{height: "100vh", width: "99%", position: "absolute"}}></div>
     <div className="flex gap-2" style={{flexDirection: "column", position: "absolute", top: "40%", left: "50%", transform: "translate(-50%, -50%)"}}>
-      <img style={{height: "4.5rem", width: "4.5rem", alignSelf: "center"}} src="/sheet-book-outline-blue.png" />
+      <img style={{height: "4.5rem", width: "4.5rem", alignSelf: "center"}} src="/sheet-book-outline-red.png" />
       <div className="flex gap-2 bg-secondary" style={{flexDirection: "column", height: "30rem", width: "40rem", borderRadius: "1rem", padding: "3rem"}}>
           <label className="label text-secondary-content" style={{fontWeight: "700", lineHeight: "0.1rem"}}>Username</label>
           <Input type="text" onChange={(e) => validateUsername(e.target.value)} id='username'/>
