@@ -30,6 +30,28 @@ Diogo Ribeiro <span style="color:grey">n° 12717033</span>
 Luiz Fernando <span style="color:grey">n° 13671678</span>
 
 ---
+# Planejamento
+
+<div class=columns2>
+    <section>
+        <h2>Plano inicial</h2>
+        <ul>
+            <li>Criação e edição de fichas de personagens</li>
+            <li>Gerenciamento de campanhas e seus participantes</li>
+            <li>Interface de interação entre mestre e jogadores</li>
+            <li>Simulação de dados do jogo</li>
+        </ul>
+    </section>
+    <section>
+        <h2>O que foi feito</h2>
+        <ul>
+            <li>Criação e edição de fichas de personagens</li>
+            <li>Gerenciamento de campanhas e seus participantes</li>
+        </ul>
+    </section>
+</div>
+
+---
 
 # Desenvolvimento (emoji aqui)
 ## Primeiros Ciclos 
