@@ -35,7 +35,7 @@ function Campaigns() {
   return (
     <div>
       <Navbar className='bg-primary shadow-xl justify-between' style={{padding: "1rem"}}>
-        <div className="flex-none">
+        <div className="flex-none gap-2">
           <Button color='ghost' className="text-primary-content" style={{padding: "0", fontWeight: "700", fontSize: "1.65rem", alignContent: "center"}} onClick={() => navigate('/')}>
             <img style={{height: "3rem", marginRight: "0.25rem"}} src="/icon.svg" />
             Sheet Book
@@ -67,8 +67,8 @@ function Campaigns() {
         {campaignList.map((campaign) => {
           return (
             <Link to="/campaigns/view" state={{user : user, campaign : campaign}} key={campaign.campaignId}>
-              <div className="bg-accent" style={{borderRadius: "1rem", padding: "1rem", margin: "1rem"}}>
-                <span className='text-accent-content'>{campaign.name}</span>
+              <div className="bg-accent flex" style={{borderRadius: "1rem", padding: "1rem", margin: "1rem", height: "5rem", alignItems: "center"}}>
+                <span className='text-accent-content' style={{fontWeight: "bold", fontSize: "1.25rem"}}>{campaign.name}</span>
               </div>
             </Link>
           );
