@@ -109,7 +109,7 @@ function Home() {
   return (
     <div>
       <Navbar className='bg-primary shadow-xl justify-between' style={{padding: "1rem"}}>
-        <div className="flex-none">
+        <div className="flex-none gap-2">
           <Button color='ghost' className="text-primary-content" style={{padding: "0", fontWeight: "700", fontSize: "1.65rem", alignContent: "center"}} onClick={() => navigate('/')}>
             <img style={{height: "3rem", marginRight: "0.25rem"}} src="/icon.svg" />
             Sheet Book
@@ -119,11 +119,14 @@ function Home() {
         </div>
         {user.name ? logged_dropdown : not_logged_dropdown}
       </Navbar>
-      <div className={user.name ? "flex gap-2 bg-primary" : "hidden"} style={{flexDirection: "column", position: "absolute", top: "40%", left: "50%", transform: "translate(-50%, -50%)", borderRadius: "1rem", padding: "3rem"}}>
-          <Button className="btn btn-secondary" style={{width: "15rem"}} onClick={() => navigate('/sheets/view', {state: {user: user}})}>Create Sheet</Button>
-          <Button className="btn btn-secondary" style={{width: "15rem"}} onClick={() => navigate('/campaigns/view', {state: {user: user}})}>Create Campaign</Button>
-          <Button className="btn btn-secondary" style={{width: "15rem"}} onClick={() => navigate('/sheets', {state: {user: user}})}>My Sheets</Button>
-          <Button className="btn btn-secondary" style={{width: "15rem"}} onClick={() => navigate('/campaigns', {state: {user: user}})}>My Campaigns</Button>
+      <div className={user.name ? "hidden" : "flex"} style={{alignItems: "center", justifyContent: "center", margin: "1rem"}}>
+        <span style={{fontSize: "2.5rem"}}>Welcome to Sheet Book, please sign in to start creating!</span>
+      </div>
+      <div className={user.name ? "flex gap-2 bg-neutral" : "hidden"} style={{flexDirection: "column", position: "absolute", top: "40%", left: "50%", transform: "translate(-50%, -50%)", borderRadius: "1rem", padding: "3rem"}}>
+          <Button className="btn btn-secondary" style={{width: "50rem", height: "5rem", fontSize: "1.5rem"}} onClick={() => navigate('/sheets/view', {state: {user: user}})}>Create Sheet</Button>
+          <Button className="btn btn-secondary" style={{width: "50rem", height: "5rem", fontSize: "1.5rem"}} onClick={() => navigate('/campaigns/view', {state: {user: user}})}>Create Campaign</Button>
+          <Button className="btn btn-secondary" style={{width: "50rem", height: "5rem", fontSize: "1.5rem"}} onClick={() => navigate('/sheets', {state: {user: user}})}>My Sheets</Button>
+          <Button className="btn btn-secondary" style={{width: "50rem", height: "5rem", fontSize: "1.5rem"}} onClick={() => navigate('/campaigns', {state: {user: user}})}>My Campaigns</Button>
       </div>
     </div>
   )
