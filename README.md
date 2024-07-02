@@ -22,5 +22,12 @@ Para executar tanto o servidor quanto o cliente web basta utilizar o seguinte co
 make
 ```
 
+Os servidores levam um tempo para iniciar, para verificar seu estado é possível usar os seguintes comandos:
+
+```bash
+docker logs sheet-book-app
+docker logs sheet-book-cli
+```
+
 ## Desenvolvimento
 [UML base das Classes do projeto](../../wiki/Arquitetura-de-Classes-do-Projeto)
