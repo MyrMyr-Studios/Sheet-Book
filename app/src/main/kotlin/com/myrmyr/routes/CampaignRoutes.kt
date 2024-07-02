@@ -58,7 +58,7 @@ fun Route.campaignRouting() {
             if(campaign == null) return@post call.respond(HttpStatusCode.NotFound)
             if(user.userId in campaign.userList) return@post call.respond(HttpStatusCode.NotModified)
             if(dao.addUserToCampaign(user.userId, campaign.campaignId) == false) return@post call.respond(HttpStatusCode.InternalServerError)
-            call.respond(HttpStatusCode.OK) // WIP
+            call.respond(HttpStatusCode.OK)
         }
 
         // Remover usuário de uma campanha por email
@@ -68,7 +68,7 @@ fun Route.campaignRouting() {
             val user = dao.findUserByEmail(email)
             if(user == null) return@get call.respond(HttpStatusCode.NotFound)
             if(dao.removeUserFromCampaign(user.userId, id) == false) return@get call.respond(HttpStatusCode.InternalServerError)
-            call.respond(HttpStatusCode.OK) // WIP
+            call.respond(HttpStatusCode.OK)
         }
     }
 
@@ -80,18 +80,8 @@ fun Route.campaignRouting() {
             val sheet = dao.findSheetById(sheetId)
             if(sheet == null) return@post call.respond(HttpStatusCode.NotFound)
             if(dao.addSheetToCampaign(sheetId, id) == false) return@post call.respond(HttpStatusCode.InternalServerError)
-            call.respond(HttpStatusCode.OK) // WIP
+            call.respond(HttpStatusCode.OK)
         }
-
-        // Remover ficha de uma campanha WIP
-        // get("{id? , sheetId?}") {
-        //     val id = (URLDecoder.decode(call.parameters["id"], "UTF-8")).toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest)
-        //     val sheetId = (URLDecoder.decode(call.parameters["sheetId"], "UTF-8")).toIntOrNull() ?: return@get call.respond(HttpStatusCode.BadRequest)
-        //     val sheet = dao.findSheetById(sheetId)
-        //     if(sheet == null) return@get call.respond(HttpStatusCode.NotFound)
-        //     if(dao.removeSheetFromCampaign(sheetId, id) == false) return@get call.respond(HttpStatusCode.InternalServerError)
-        //     call.respond(HttpStatusCode.OK) // WIP
-        // }
     }
 
     route("/campaign/delete") {

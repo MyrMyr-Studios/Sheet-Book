@@ -22,6 +22,6 @@ object Campaigns : Table() {
 }
 
 object RelationUserCampaign : Table() {
-    val userId = integer("userId").references(Users.userId, onDelete = ReferenceOption.CASCADE)//reference("userId", Users.userId, OnDelete = ReferenceOptions.CASCADE)
-    val campaignId = integer("campaignId").references(Campaigns.campaignId, onDelete = ReferenceOption.CASCADE)//reference("campaignId", Campaigns.campaignId)
+    val userId = integer("userId").references(Users.userId, onDelete = ReferenceOption.CASCADE)
+    val campaignId = integer("campaignId").references(Campaigns.campaignId, onDelete = ReferenceOption.CASCADE)
 }
