@@ -38,7 +38,7 @@ services:
       - 8080:8080
     volumes:
       - ./app:/app
-    command: ./gradlew test --tests "com.myrmyr.ApplicationTest"
+    command: ./gradlew test --tests "com.myrmyr.UserTest" test --tests "com.myrmyr.SheetTest" test --tests "com.myrmyr.CampaignTest"
 
 networks:
   sheet-book:
