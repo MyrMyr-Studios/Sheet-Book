@@ -29,7 +29,7 @@ docker logs sheet-book-app
 docker logs sheet-book-cli
 ```
 
-Para finalizar o servidor utilize:
+Para finalizar o servidor (apaga a sessão dos usuários conectados) utilize:
 
 ```bash
 make down
