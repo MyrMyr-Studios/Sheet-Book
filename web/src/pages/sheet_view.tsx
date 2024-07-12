@@ -73,7 +73,10 @@ function SheetEdit() {
 
   const setCampaign = (id: any) => {
     setSheet({...sheet, campaignId: id})
-    getCampaignName(id)
+    if (id === null || id === -1)
+      setCampaignName("Selecionar campanha")
+    else
+      getCampaignName(id)
   }
 
   const getCampaignName = (id: any) => {
@@ -136,7 +139,6 @@ function SheetEdit() {
               <Dropdown.Item onClick={() => navigate('/campaigns', {state: {user: user}})}>Campaigns</Dropdown.Item>
               <hr style={{marginTop: ".5rem", marginBottom: ".5rem"}}/>
               <Dropdown.Item onClick={() => navigate('/profile', {state: {user: user}})}>Profile</Dropdown.Item>
-              <Dropdown.Item>Settings</Dropdown.Item>
               <Dropdown.Item onClick={loggout}>Logout</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
@@ -334,11 +336,11 @@ function SheetEdit() {
                 <Dropdown.Item key={campaign.campaignId} onClick={() => setCampaign(campaign.campaignId)}>{campaign.name}</Dropdown.Item>
               );
             })}
+            <Dropdown.Item onClick={() => setCampaign(null)}>Nenhuma</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
         <Button className="btn btn-accent" style={{width: "10rem", height: "3rem", margin: "1rem"}} onClick={deleteSheet}>Delete</Button>
         <Button className="btn btn-secondary" style={{width: "10rem", height: "3rem", margin: "1rem"}} onClick={() => navigate("/sheets", {state: {user: user}})}>Cancel</Button>
-        {/* <pre style={{width: "50vw", height: "80vh", overflowY: "scroll"}}>{JSON.stringify(sheet, null, 2)}</pre> */}
       </div>
     </div>
   );          

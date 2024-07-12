@@ -190,7 +190,6 @@ function CampaignView() {
               <Dropdown.Item onClick={() => navigate('/campaigns', {state: {user: user}})}>Campaigns</Dropdown.Item>
               <hr style={{marginTop: ".5rem", marginBottom: ".5rem"}}/>
               <Dropdown.Item onClick={() => navigate('/profile', {state: {user: user}})}>Profile</Dropdown.Item>
-              <Dropdown.Item>Settings</Dropdown.Item>
               <Dropdown.Item onClick={loggout}>Logout</Dropdown.Item>
             </Dropdown.Menu>
           </Dropdown>
