@@ -10,11 +10,11 @@ Sheet Book é uma aplicação web desenvolvida utilizando o framework **Ktor** p
 
 - Login e criação de contas;
 - Criação e gerenciamento de campanhas;
-- Adição de personagens em camapanhas já existentes;
+- Adição de fichas em campanhas já existentes;
 - Criação e modificação de fichas;
 
 ## Como usar?
-Utilizando a página web do projeto será possível realizar login para ter acesso a todas as funcionalidades dele, mantendo salva suas criações na núvem para poder editá-las de qualquer lugar.
+Utilizando a página web do projeto será possível realizar login para ter acesso a todas as funcionalidades dele, mantendo salva suas criações na nuvem para poder editá-las de qualquer lugar.
 
 Para executar tanto o servidor quanto o cliente web basta utilizar o seguinte comando na pasta raiz do projeto:
 
@@ -27,6 +27,20 @@ Os servidores levam um tempo para iniciar, para verificar seu estado é possíve
 ```bash
 docker logs sheet-book-app
 docker logs sheet-book-cli
+```
+
+Para finalizar o servidor (apaga a sessão dos usuários conectados) utilize:
+
+```bash
+make down
+```
+
+## Testes
+
+Os testes podem ser executados com:
+
+```bash
+make tests
 ```
 
 ## Desenvolvimento
